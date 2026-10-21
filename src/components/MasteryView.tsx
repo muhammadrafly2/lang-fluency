@@ -8,21 +8,31 @@ import {
   ChevronDown, ChevronUp, Languages
 } from "lucide-react";
 import { ConstellationNode, RoadmapSection } from "@/types";
-import { JAPANESE_COURSE_ROADMAP, ENGLISH_COURSE_ROADMAP } from "@/data/learningRoadmaps";
+import { getCourseRoadmap } from "@/data/learningRoadmaps";
 import { JapaneseTopicModules } from "./JapaneseTopicModules";
+import { LanguageEssentialsModules } from "./LanguageEssentialsModules";
 
 interface MasteryViewProps {
   onLaunchNodeScenario: (nodeTitle: string) => void;
-  initialLanguage?: "english" | "japanese";
-  onLanguageChange?: (lang: "english" | "japanese") => void;
+  initialLanguage?: string;
+  onLanguageChange?: (lang: string) => void;
 }
+
+const ALL_MASTERY_LANGUAGES = [
+  { code: "english", flag: "🇺🇸", label: "English" },
+  { code: "japanese", flag: "🇯🇵", label: "Japanese" },
+  { code: "french", flag: "🇫🇷", label: "French" },
+  { code: "korean", flag: "🇰🇷", label: "Korean" },
+  { code: "german", flag: "🇩🇪", label: "German" },
+  { code: "spanish", flag: "🇪🇸", label: "Spanish" },
+];
 
 export function MasteryView({ 
   onLaunchNodeScenario, 
   initialLanguage = "japanese",
   onLanguageChange 
 }: MasteryViewProps) {
-  const [activeLang, setActiveLang] = useState<"english" | "japanese">(initialLanguage);
+  const [activeLang, setActiveLang] = useState<string>(initialLanguage);
   const [selectedNode, setSelectedNode] = useState<ConstellationNode | null>(null);
   const [expandedSectionId, setExpandedSectionId] = useState<string>(
     initialLanguage === "japanese" ? "jp-sec-1" : "en-sec-1"
@@ -35,7 +45,7 @@ export function MasteryView({
     }
   }, [initialLanguage]);
 
-  const currentCourse = activeLang === "japanese" ? JAPANESE_COURSE_ROADMAP : ENGLISH_COURSE_ROADMAP;
+  const currentCourse = getCourseRoadmap(activeLang);
   const constellationNodes = currentCourse.constellationNodes;
 
   return (
@@ -64,39 +74,30 @@ export function MasteryView({
           </p>
         </div>
 
-        {/* Dual Language Switcher Toggle */}
+        {/* Multi-Language Switcher Tabs */}
         <div className="flex flex-col sm:flex-row items-center gap-3 relative z-10 w-full md:w-auto">
-          <div className="p-1 rounded-2xl bg-[#09111e] border border-slate-800 flex items-center gap-1 w-full sm:w-auto shadow-inner">
-            <button
-              onClick={() => {
-                setActiveLang("english");
-                setExpandedSectionId("en-sec-1");
-                onLanguageChange?.("english");
-              }}
-              className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                activeLang === "english"
-                  ? "bg-cyan-400 text-slate-950 shadow-[0_0_15px_rgba(0,229,255,0.4)]"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <span>🇺🇸</span>
-              <span>English (CEFR)</span>
-            </button>
-            <button
-              onClick={() => {
-                setActiveLang("japanese");
-                setExpandedSectionId("jp-sec-1");
-                onLanguageChange?.("japanese");
-              }}
-              className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                activeLang === "japanese"
-                  ? "bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)]"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <span>🇯🇵</span>
-              <span>Japanese (日本語)</span>
-            </button>
+          <div className="p-1 rounded-2xl bg-[#09111e] border border-slate-800 flex flex-wrap items-center gap-1 w-full sm:w-auto shadow-inner">
+            {ALL_MASTERY_LANGUAGES.map((lang) => {
+              const isActive = activeLang === lang.code;
+              return (
+                <button
+                  key={lang.code}
+                  onClick={() => {
+                    setActiveLang(lang.code);
+                    setExpandedSectionId(`${lang.code.slice(0, 2)}-sec-1`);
+                    onLanguageChange?.(lang.code);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    isActive
+                      ? "bg-cyan-400 text-slate-950 shadow-[0_0_15px_rgba(0,229,255,0.4)]"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <span>{lang.flag}</span>
+                  <span className="hidden sm:inline">{lang.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Quick Metrics */}
@@ -207,9 +208,15 @@ export function MasteryView({
         </div>
       </div>
 
-      {/* ── Japanese Core Learning Modules & Topics (when Japanese is active) ── */}
-      {activeLang === "japanese" && (
+      {/* ── Language Core Learning Modules & Topics ── */}
+      {activeLang === "japanese" ? (
         <JapaneseTopicModules
+          onStartScenarioCall={(scenarioId) => onLaunchNodeScenario(scenarioId || "Daily Banter")}
+        />
+      ) : (
+        <LanguageEssentialsModules
+          languageCode={activeLang}
+          languageName={currentCourse.languageName}
           onStartScenarioCall={(scenarioId) => onLaunchNodeScenario(scenarioId || "Daily Banter")}
         />
       )}
@@ -351,18 +358,20 @@ export function MasteryView({
                             </span>
                           </div>
 
-                          {/* Japanese Text (Kanji/Kana), Romaji, and English Meaning */}
-                          {step.japaneseText && (
+                          {/* Target Expression & Vocabulary */}
+                          {(step.targetText || step.japaneseText) && (
                             <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 flex flex-col gap-1.5">
                               <div className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">
-                                Japanese Expression & Vocabulary
+                                {currentCourse.languageName} Expression & Vocabulary
                               </div>
                               <div className="text-base sm:text-lg font-bold text-white tracking-wide">
-                                {step.japaneseText}
+                                {step.targetText || step.japaneseText}
                               </div>
-                              <div className="text-xs font-mono text-[#00e5ff]">
-                                {step.romaji}
-                              </div>
+                              {(step.phoneticScript || step.romaji) && (
+                                <div className="text-xs font-mono text-[#00e5ff]">
+                                  {step.phoneticScript || step.romaji}
+                                </div>
+                              )}
                               <div className="text-xs text-slate-300 mt-0.5">
                                 <strong className="text-slate-400">Meaning:</strong> {step.englishMeaning}
                               </div>
@@ -375,14 +384,14 @@ export function MasteryView({
                               <span className="text-[10px] font-mono font-bold uppercase text-slate-400">
                                 Example Dialogue & Context
                               </span>
-                              {step.exampleSentence.japanese && (
+                              {(step.exampleSentence.target || step.exampleSentence.japanese) && (
                                 <div className="text-slate-200 font-medium">
-                                  {step.exampleSentence.japanese}
+                                  {step.exampleSentence.target || step.exampleSentence.japanese}
                                 </div>
                               )}
-                              {step.exampleSentence.romaji && (
+                              {(step.exampleSentence.phonetic || step.exampleSentence.romaji) && (
                                 <div className="text-[11px] font-mono text-cyan-300/80">
-                                  {step.exampleSentence.romaji}
+                                  {step.exampleSentence.phonetic || step.exampleSentence.romaji}
                                 </div>
                               )}
                               <div className="text-slate-400">

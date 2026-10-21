@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  /* Obsidian Fluency Theme */
-  --bg-obsidian: #070b14;
-  --bg-surface: #0b1120;
-  --bg-glass: rgba(15, 23, 42, 0.7);
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-neon: rgba(0, 229, 255, 0.3);
+  /* Clean Fun Learning Theme (Matching Mobile Mockup) */
+  --bg-clean: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-forest: #0f4a3c;
+  --bg-emerald: #10b981;
+  --border-clean: #e2e8f0;
 
   --neon-cyan: #00e5ff;
   --neon-emerald: #10b981;
@@ -14,9 +14,9 @@
   --neon-orange: #f97316;
   --neon-gold: #facc15;
 
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-faint: #475569;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
 
   --font-poppins: var(--font-poppins);
   --font-space: var(--font-space);
@@ -27,8 +27,8 @@
 }
 
 html, body {
-  background-color: var(--bg-obsidian);
-  color: var(--text-main);
+  background-color: #f8fafc;
+  color: #0f172a;
   font-family: 'Poppins', var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   margin: 0;
   padding: 0;
@@ -40,17 +40,17 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Subtle holographic dark dot grid background */
+/* Subtle clean soft dot grid background */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 100% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
-    radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 28px 28px;
+    radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.05) 0%, transparent 60%),
+    radial-gradient(circle at 100% 50%, rgba(15, 74, 60, 0.04) 0%, transparent 50%),
+    radial-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 24px 24px;
   pointer-events: none;
 }
 

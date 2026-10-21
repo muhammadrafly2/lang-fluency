@@ -8,6 +8,7 @@ import {
   SlidersHorizontal, Users, Palette, PlusCircle, Activity
 } from "lucide-react";
 import { Scenario } from "@/types";
+import { getCoachPersona } from "@/utils/coachPersonas";
 
 interface ScenarioHubViewProps {
   scenarios: Scenario[];
@@ -15,6 +16,8 @@ interface ScenarioHubViewProps {
   onOpenWarmup: () => void;
   onOpenStudio: () => void;
   onStartFreeCall: () => void;
+  targetLanguage?: string;
+  ttsVoiceURI?: string;
 }
 
 const WAVEFORM_BARS = [
@@ -39,8 +42,11 @@ export function ScenarioHubView({
   onOpenWarmup,
   onOpenStudio,
   onStartFreeCall,
+  targetLanguage = "english",
+  ttsVoiceURI,
 }: ScenarioHubViewProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const coachPersona = getCoachPersona(targetLanguage, ttsVoiceURI);
 
   const categories = [
     { id: "All", label: "All" },
@@ -89,8 +95,8 @@ export function ScenarioHubView({
             <div className="relative shrink-0">
               <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border border-slate-700/80 bg-slate-800">
                 <img
-                  src="/elena-coach.jpg"
-                  alt="Elena Vance"
+                  src={coachPersona.avatarUrl}
+                  alt={coachPersona.name}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -100,16 +106,16 @@ export function ScenarioHubView({
             {/* Name and subtitle */}
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <h2 className="text-sm md:text-base font-bold text-white tracking-tight">Elena Vance</h2>
+                <h2 className="text-sm md:text-base font-bold text-white tracking-tight">{coachPersona.name}</h2>
                 <svg className="w-3.5 h-3.5 text-[#00e5ff] fill-current" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
                 <span className="hidden md:inline-flex px-2 py-0.5 rounded-full bg-cyan-400/10 text-cyan-300 text-[10px] font-mono font-bold ml-1">
-                  Oxford C2
+                  {coachPersona.badge}
                 </span>
               </div>
               <span className="text-[11px] md:text-xs text-slate-400">
-                Oxford Accent • Tech & Casual
+                {coachPersona.role}
               </span>
             </div>
 

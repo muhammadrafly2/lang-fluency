@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Scenario, InCallTelemetry, ChatMessage, PhoneticGuide } from "@/types";
 import { speakElena } from "@/utils/speechEngine";
+import { getCoachPersona } from "@/utils/coachPersonas";
 
 interface BrowserSpeechRecognition {
   continuous: boolean;
@@ -54,6 +55,8 @@ export function LiveCallModal({
   ttsVoiceURI,
   targetLanguage = "english",
 }: LiveCallModalProps) {
+  const coachPersona = getCoachPersona(targetLanguage, ttsVoiceURI);
+
   // Call States: "idle" | "listening" | "processing" | "speaking"
   const [callState, setCallState] = useState<"idle" | "listening" | "processing" | "speaking">("idle");
   const [isLoudspeaker, setIsLoudspeaker] = useState(true);
@@ -129,7 +132,7 @@ export function LiveCallModal({
       voiceURI: ttsVoiceURI,
       rate: ttsSpeed,
       pitch: ttsPitch,
-      targetLanguage: isJapanese ? "japanese" : "english",
+      targetLanguage: targetLanguage || (isJapanese ? "japanese" : "english"),
       isLoudspeaker,
       onStart: () => setCallState("speaking"),
       onEnd: () => setCallState("idle"),
@@ -137,7 +140,7 @@ export function LiveCallModal({
     });
 
     ttsCancelRef.current = cancel;
-  }, [isLoudspeaker, ttsSpeed, ttsPitch, ttsVoiceURI, isJapanese]);
+  }, [isLoudspeaker, ttsSpeed, ttsPitch, ttsVoiceURI, isJapanese, targetLanguage]);
 
   // Initialize call session when modal opens
   useEffect(() => {
@@ -200,8 +203,15 @@ export function LiveCallModal({
     try {
       const recognition = new SpeechAPI();
       recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = isJapanese ? "ja-JP" : "en-US";
+      const langMap: Record<string, string> = {
+        japanese: "ja-JP",
+        french: "fr-FR",
+        korean: "ko-KR",
+        german: "de-DE",
+        spanish: "es-ES",
+        english: "en-US",
+      };
+      recognition.lang = langMap[targetLanguage] || (isJapanese ? "ja-JP" : "en-US");
 
       recognition.onstart = () => {
         setCallState("listening");
@@ -295,6 +305,7 @@ export function LiveCallModal({
           history: messages.slice(-4),
           scenarioId: scenario?.id,
           scenarioTitle: scenario?.title,
+          targetLanguage,
           apiKey,
         }),
       });
@@ -375,9 +386,9 @@ export function LiveCallModal({
       {/* ── Top Bar: Scenario Title & Call Timer ── */}
       <header className="relative z-10 px-6 pt-5 pb-3 flex items-center justify-between border-b border-white/10 backdrop-blur-md bg-black/40">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl overflow-hidden border border-cyan-400/40">
+          <div className="w-10 h-10 rounded-2xl overflow-hidden border border-cyan-400/40 bg-slate-900">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/elena-coach.jpg" alt="Elena AI" className="w-full h-full object-cover" />
+            <img src={coachPersona.avatarUrl} alt={coachPersona.name} className="w-full h-full object-cover" />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -390,7 +401,7 @@ export function LiveCallModal({
             </div>
             <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Coach Elena • In-Call Simulation</span>
+              <span>Coach {coachPersona.name.split(" ")[0]} • In-Call Simulation</span>
             </p>
           </div>
         </div>

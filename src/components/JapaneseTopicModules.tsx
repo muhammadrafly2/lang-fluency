@@ -93,25 +93,25 @@ export function JapaneseTopicModules({
             <button
               key={topic.id}
               onClick={() => setSelectedTopic(topic)}
-              className="p-4 sm:p-5 rounded-2xl bg-[#0e1626] border border-slate-800/90 hover:border-emerald-500/50 hover:bg-[#121c30] transition-all duration-200 text-left flex items-start gap-4 group relative overflow-hidden shadow-lg shadow-black/20"
+              className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/30 transition-all duration-200 text-left flex items-start gap-4 group relative overflow-hidden shadow-sm hover:shadow-md cursor-pointer"
             >
               {/* Subtle hover sheen */}
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-              {/* Circular Badge with Light Mint Tint */}
-              <div className="w-11 h-11 rounded-full bg-[#132d24] text-[#4ade80] border border-emerald-500/30 flex items-center justify-center font-bold text-base shrink-0 shadow-sm group-hover:scale-105 group-hover:border-emerald-400 transition-all">
+              {/* Circular Badge with Light Mint Tint matching screenshot */}
+              <div className="w-11 h-11 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 flex items-center justify-center font-bold text-base shrink-0 shadow-sm group-hover:scale-105 group-hover:border-emerald-400 transition-all">
                 <span>{topic.badge}</span>
               </div>
 
               {/* Title & Description */}
               <div className="flex flex-col min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <h4 className="text-sm sm:text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
+                  <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">
                     {topic.title}
                   </h4>
-                  <ChevronRight size={16} className="text-slate-500 group-hover:text-emerald-400 transition-colors shrink-0" />
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 transition-colors shrink-0" />
                 </div>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">
                   {topic.description}
                 </p>
               </div>
@@ -124,7 +124,7 @@ export function JapaneseTopicModules({
       <AnimatePresence>
         {selectedTopic && activeTab && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 sm:p-6 overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto"
             onClick={(e) => {
               if (e.target === e.currentTarget) setSelectedTopic(null);
             }}
@@ -134,21 +134,21 @@ export function JapaneseTopicModules({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.2 }}
-              className="bg-[#0b111e] border border-slate-700/80 rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl shadow-black/80 overflow-hidden relative"
+              className="bg-white border border-slate-200 rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden relative text-slate-900"
             >
               {/* Modal Top Header */}
-              <div className="p-5 sm:p-6 border-b border-slate-800 flex items-center justify-between gap-4 bg-[#0e1627]">
+              <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between gap-4 bg-slate-50">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-full bg-[#132d24] text-[#4ade80] border border-emerald-500/40 flex items-center justify-center font-bold text-base shrink-0 shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center justify-center font-bold text-base shrink-0 shadow-sm">
                     <span>{selectedTopic.badge}</span>
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-700 font-bold">
                         {selectedTopic.category}
                       </span>
                     </div>
-                    <h3 className="text-lg font-space font-extrabold text-white">
+                    <h3 className="text-lg font-space font-extrabold text-slate-900">
                       {selectedTopic.title}
                     </h3>
                   </div>
@@ -156,14 +156,14 @@ export function JapaneseTopicModules({
 
                 <button
                   onClick={() => setSelectedTopic(null)}
-                  className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+                  className="w-9 h-9 rounded-full bg-slate-200/60 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors"
                 >
                   <X size={18} />
                 </button>
               </div>
 
               {/* Tab Navigation Pill Bar */}
-              <div className="px-5 pt-3 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto no-scrollbar bg-[#090e18]">
+              <div className="px-5 pt-3 border-b border-slate-100 flex items-center gap-2 overflow-x-auto no-scrollbar bg-slate-50/50">
                 {selectedTopic.tabs.map((tab) => {
                   const isActive = tab.id === activeTab.id;
                   return (
@@ -172,8 +172,8 @@ export function JapaneseTopicModules({
                       onClick={() => setActiveTabId(tab.id)}
                       className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                         isActive
-                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm"
-                          : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                          ? "bg-emerald-600 text-white shadow-sm"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                       }`}
                     >
                       {tab.icon && <span>{tab.icon}</span>}
@@ -184,10 +184,10 @@ export function JapaneseTopicModules({
               </div>
 
               {/* Modal Body Content (Scrollable) */}
-              <div className="p-5 sm:p-6 overflow-y-auto flex flex-col gap-6 flex-1">
+              <div className="p-5 sm:p-6 overflow-y-auto flex flex-col gap-6 flex-1 bg-white">
                 {/* Summary Box */}
-                <div className="bg-[#111928] border border-slate-800 rounded-xl p-4">
-                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                     {activeTab.content.summary}
                   </p>
                 </div>
@@ -197,11 +197,11 @@ export function JapaneseTopicModules({
                   {activeTab.content.subsections.map((sub, sIdx) => (
                     <div key={sIdx} className="flex flex-col gap-2.5">
                       <div>
-                        <h4 className="text-sm font-bold text-white tracking-tight">
+                        <h4 className="text-sm font-bold text-slate-900 tracking-tight">
                           {sub.title}
                         </h4>
                         {sub.description && (
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-xs text-slate-500 mt-0.5">
                             {sub.description}
                           </p>
                         )}
@@ -216,31 +216,31 @@ export function JapaneseTopicModules({
                           return (
                             <div
                               key={iIdx}
-                              className="bg-[#0e1627] border border-slate-800/80 rounded-xl p-3 flex flex-col justify-between gap-2 hover:border-slate-700 transition-colors"
+                              className="bg-slate-50/60 border border-slate-200 rounded-xl p-3 flex flex-col justify-between gap-2 hover:border-emerald-300 hover:bg-emerald-50/20 transition-colors shadow-sm"
                             >
                               <div className="flex flex-col gap-1">
                                 <div className="flex items-start justify-between gap-2">
                                   {item.japanese && (
-                                    <span className="text-sm font-bold text-emerald-300">
+                                    <span className="text-sm font-bold text-emerald-800">
                                       {item.japanese}
                                     </span>
                                   )}
                                   {item.tag && (
-                                    <span className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] font-mono text-slate-400 border border-white/5 shrink-0">
+                                    <span className="px-2 py-0.5 rounded-md bg-slate-200/80 text-[10px] font-mono text-slate-600 border border-slate-200 shrink-0 font-semibold">
                                       {item.tag}
                                     </span>
                                   )}
                                 </div>
                                 {item.romaji && (
-                                  <span className="text-xs font-mono text-slate-400 italic">
+                                  <span className="text-xs font-mono text-slate-500 italic">
                                     {item.romaji}
                                   </span>
                                 )}
-                                <span className="text-xs font-medium text-slate-200">
+                                <span className="text-xs font-medium text-slate-800">
                                   {item.english}
                                 </span>
                                 {item.detail && (
-                                  <span className="text-[11px] text-slate-400 mt-1 leading-snug">
+                                  <span className="text-[11px] text-slate-500 mt-1 leading-snug">
                                     {item.detail}
                                   </span>
                                 )}
@@ -253,8 +253,8 @@ export function JapaneseTopicModules({
                                   onClick={() => handlePlayAudio(item.japanese!, itemKey)}
                                   className={`self-start mt-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all ${
                                     isPlayingThis
-                                      ? "bg-emerald-500 text-slate-950 font-bold shadow-[0_0_10px_#10b981] animate-pulse"
-                                      : "bg-white/5 hover:bg-white/10 text-emerald-400 border border-white/5"
+                                      ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/30 animate-pulse"
+                                      : "bg-white hover:bg-slate-100 text-emerald-700 border border-slate-200"
                                   }`}
                                 >
                                   <Volume2 size={12} />
@@ -271,25 +271,25 @@ export function JapaneseTopicModules({
 
                 {/* Drill Prompt & Elena Call Launcher */}
                 {activeTab.content.drillPrompt && (
-                  <div className="mt-2 bg-gradient-to-br from-[#0e2136] via-[#10243d] to-[#0c1a2d] border border-cyan-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="mt-2 bg-gradient-to-br from-emerald-50 via-teal-50 to-white border border-emerald-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                     <div className="flex flex-col gap-1.5 flex-1">
                       <div className="flex items-center gap-2">
-                        <Sparkles size={14} className="text-[#00e5ff]" />
-                        <span className="text-xs font-bold uppercase tracking-wider text-cyan-300 font-mono">
+                        <Sparkles size={14} className="text-emerald-700" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 font-mono">
                           Live Pronunciation Drill
                         </span>
                       </div>
-                      <p className="text-xs text-slate-300">
+                      <p className="text-xs text-slate-600">
                         {activeTab.content.drillPrompt.instruction}
                       </p>
-                      <div className="bg-[#070e1b] rounded-xl p-3 border border-slate-800/80 mt-1 flex flex-col gap-0.5">
-                        <span className="text-sm font-bold text-white">
+                      <div className="bg-white rounded-xl p-3 border border-emerald-100 mt-1 flex flex-col gap-0.5 shadow-sm">
+                        <span className="text-sm font-bold text-slate-900">
                           💬 {activeTab.content.drillPrompt.phraseJapanese}
                         </span>
-                        <span className="text-xs font-mono text-cyan-300/90 italic">
+                        <span className="text-xs font-mono text-emerald-700 italic">
                           {activeTab.content.drillPrompt.phraseRomaji}
                         </span>
-                        <span className="text-xs text-slate-300">
+                        <span className="text-xs text-slate-600">
                           &ldquo;{activeTab.content.drillPrompt.phraseEnglish}&rdquo;
                         </span>
                       </div>
@@ -304,7 +304,7 @@ export function JapaneseTopicModules({
                             "drill-prompt"
                           )
                         }
-                        className="px-4 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white flex items-center justify-center gap-1.5 transition-colors"
+                        className="px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                       >
                         <Volume2 size={14} />
                         <span>Listen to Native Audio</span>
@@ -318,7 +318,7 @@ export function JapaneseTopicModules({
                             setSelectedTopic(null);
                             onStartScenarioCall(scId);
                           }}
-                          className="px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:brightness-110 active:scale-95 transition-all"
+                          className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#0f4a3c] hover:bg-[#0a352a] text-white flex items-center justify-center gap-2 shadow-md shadow-[#0f4a3c]/20 hover:brightness-105 active:scale-95 transition-all"
                         >
                           <PhoneCall size={14} />
                           <span>Practice with Elena</span>
@@ -335,3 +335,4 @@ export function JapaneseTopicModules({
     </div>
   );
 }
+

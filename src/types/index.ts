@@ -95,9 +95,15 @@ export interface RoadmapStep {
   estimatedTime: string;
   japaneseText?: string;
   romaji?: string;
+  targetText?: string;
+  phoneticScript?: string;
+  phoneticGuide?: string;
   englishMeaning: string;
   exampleSentence?: {
     japanese?: string;
+    target?: string;
+    targetText?: string;
+    phonetic?: string;
     romaji?: string;
     english: string;
   };
@@ -123,7 +129,7 @@ export interface RoadmapSection {
 }
 
 export interface CourseRoadmap {
-  languageId: "english" | "japanese";
+  languageId: string;
   languageName: string;
   flag: string;
   trackLabel: string;
@@ -196,7 +202,9 @@ export const ENGLISH_LEVELS = [
 export const TARGET_LANGUAGES = [
   { id: "english", label: "English", flag: "🇺🇸", speechLang: "en-US" },
   { id: "japanese", label: "Japanese", flag: "🇯🇵", speechLang: "ja-JP" },
+  { id: "french", label: "French", flag: "🇫🇷", speechLang: "fr-FR" },
   { id: "korean", label: "Korean", flag: "🇰🇷", speechLang: "ko-KR" },
+  { id: "german", label: "German", flag: "🇩🇪", speechLang: "de-DE" },
   { id: "spanish", label: "Spanish", flag: "🇪🇸", speechLang: "es-ES" },
 ];
 

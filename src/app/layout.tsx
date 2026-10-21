@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${poppins.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
-      <body className="bg-[#070b14] text-[#f8fafc] font-[var(--font-poppins)] antialiased select-none" suppressHydrationWarning>
+      <body className="bg-[#f8fafc] text-[#0f172a] font-[var(--font-poppins)] antialiased select-none" suppressHydrationWarning>
         {children}
       </body>
     </html>

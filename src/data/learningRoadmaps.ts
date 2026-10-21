@@ -681,3 +681,35 @@ export const ENGLISH_COURSE_ROADMAP: CourseRoadmap = {
     },
   ],
 };
+
+export { FRENCH_COURSE_ROADMAP } from "./roadmaps/frenchRoadmap";
+export { KOREAN_COURSE_ROADMAP } from "./roadmaps/koreanRoadmap";
+export { GERMAN_COURSE_ROADMAP } from "./roadmaps/germanRoadmap";
+export { SPANISH_COURSE_ROADMAP } from "./roadmaps/spanishRoadmap";
+
+import { FRENCH_COURSE_ROADMAP } from "./roadmaps/frenchRoadmap";
+import { KOREAN_COURSE_ROADMAP } from "./roadmaps/koreanRoadmap";
+import { GERMAN_COURSE_ROADMAP } from "./roadmaps/germanRoadmap";
+import { SPANISH_COURSE_ROADMAP } from "./roadmaps/spanishRoadmap";
+
+/**
+ * Returns the relevant CourseRoadmap dynamically based on the active language code.
+ */
+export function getCourseRoadmap(langCode: string): CourseRoadmap {
+  switch (langCode) {
+    case "japanese":
+      return JAPANESE_COURSE_ROADMAP;
+    case "french":
+      return FRENCH_COURSE_ROADMAP;
+    case "korean":
+      return KOREAN_COURSE_ROADMAP;
+    case "german":
+      return GERMAN_COURSE_ROADMAP;
+    case "spanish":
+      return SPANISH_COURSE_ROADMAP;
+    case "english":
+    default:
+      return ENGLISH_COURSE_ROADMAP;
+  }
+}
+

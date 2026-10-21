@@ -128,11 +128,12 @@ export function humanizeSpeechText(rawText: string, isJapanese: boolean = false)
  */
 export function selectElenaVoice(
   voices: SpeechSynthesisVoice[],
-  options: { isJapanese?: boolean; preferredURI?: string } = {}
+  options: { language?: string; isJapanese?: boolean; preferredURI?: string } = {}
 ): SpeechSynthesisVoice | null {
   if (!voices || voices.length === 0) return null;
 
   const { isJapanese = false, preferredURI } = options;
+  const lang = options.language || (isJapanese ? "japanese" : "english");
 
   // 1. If explicit user-selected voice URI provided and exists in available voices
   if (preferredURI) {
@@ -141,13 +142,11 @@ export function selectElenaVoice(
   }
 
   // 2. Japanese Language Track
-  if (isJapanese) {
-    // Priority order for Japanese: Enhanced/Premium female voices
+  if (lang === "japanese" || isJapanese) {
     const jaVoices = voices.filter(
       (v) => (v.lang.startsWith("ja") || v.lang.includes("JP")) && !isBlacklisted(v.name)
     );
     if (jaVoices.length > 0) {
-      // Look for natural / enhanced voices like Kyoko or Nanami
       const bestJa = jaVoices.find(
         (v) =>
           v.name.includes("Kyoko") ||
@@ -160,7 +159,82 @@ export function selectElenaVoice(
     }
   }
 
-  // 3. English Language Track (Elena Vance - Oxford C2 British Accent)
+  // 3. French Language Track
+  if (lang === "french") {
+    const frVoices = voices.filter(
+      (v) => (v.lang.startsWith("fr") || v.lang.includes("FR")) && !isBlacklisted(v.name)
+    );
+    if (frVoices.length > 0) {
+      const bestFr = frVoices.find(
+        (v) =>
+          v.name.includes("Audrey") ||
+          v.name.includes("Amelie") ||
+          v.name.includes("Marie") ||
+          v.name.includes("Thomas") ||
+          v.name.includes("Natural") ||
+          v.name.includes("Enhanced")
+      );
+      return bestFr || frVoices[0];
+    }
+  }
+
+  // 4. Korean Language Track
+  if (lang === "korean") {
+    const koVoices = voices.filter(
+      (v) => (v.lang.startsWith("ko") || v.lang.includes("KR")) && !isBlacklisted(v.name)
+    );
+    if (koVoices.length > 0) {
+      const bestKo = koVoices.find(
+        (v) =>
+          v.name.includes("Yuna") ||
+          v.name.includes("Sun-Hi") ||
+          v.name.includes("Minji") ||
+          v.name.includes("Sora") ||
+          v.name.includes("Natural") ||
+          v.name.includes("Enhanced")
+      );
+      return bestKo || koVoices[0];
+    }
+  }
+
+  // 5. German Language Track
+  if (lang === "german") {
+    const deVoices = voices.filter(
+      (v) => (v.lang.startsWith("de") || v.lang.includes("DE")) && !isBlacklisted(v.name)
+    );
+    if (deVoices.length > 0) {
+      const bestDe = deVoices.find(
+        (v) =>
+          v.name.includes("Anna") ||
+          v.name.includes("Petra") ||
+          v.name.includes("Marlene") ||
+          v.name.includes("Natural") ||
+          v.name.includes("Enhanced")
+      );
+      return bestDe || deVoices[0];
+    }
+  }
+
+  // 6. Spanish Language Track
+  if (lang === "spanish") {
+    const esVoices = voices.filter(
+      (v) => (v.lang.startsWith("es") || v.lang.includes("ES") || v.lang.includes("MX")) && !isBlacklisted(v.name)
+    );
+    if (esVoices.length > 0) {
+      const bestEs = esVoices.find(
+        (v) =>
+          v.name.includes("Monica") ||
+          v.name.includes("Paulina") ||
+          v.name.includes("Lucia") ||
+          v.name.includes("Conchita") ||
+          v.name.includes("Natural") ||
+          v.name.includes("Enhanced")
+      );
+      return bestEs || esVoices[0];
+    }
+  }
+
+  // 7. English Language Track (Elena Vance - Oxford C2 British Accent)
   const nonBlacklistedEnglish = voices.filter(
     (v) => v.lang.startsWith("en") && !isBlacklisted(v.name)
   );
@@ -298,7 +372,11 @@ export function speakElena(
   }
 
   const voices = window.speechSynthesis.getVoices();
-  const selectedVoice = selectElenaVoice(voices, { isJapanese, preferredURI: voiceURI });
+  const selectedVoice = selectElenaVoice(voices, {
+    language: targetLanguage,
+    isJapanese,
+    preferredURI: voiceURI,
+  });
 
   const clauses = segmentSpeechClauses(cleanText);
   let isCancelled = false;
@@ -322,12 +400,20 @@ export function speakElena(
     const clause = clauses[currentIndex];
     const utterance = new SpeechSynthesisUtterance(clause.text);
 
-    // Apply voice
+    // Apply voice with language fallback
     if (selectedVoice) {
       utterance.voice = selectedVoice;
       utterance.lang = selectedVoice.lang;
     } else {
-      utterance.lang = isJapanese ? "ja-JP" : "en-GB";
+      const defaultLangMap: Record<string, string> = {
+        japanese: "ja-JP",
+        french: "fr-FR",
+        korean: "ko-KR",
+        german: "de-DE",
+        spanish: "es-ES",
+        english: "en-GB",
+      };
+      utterance.lang = defaultLangMap[targetLanguage] || "en-GB";
     }
 
     // Pacing & Pitch

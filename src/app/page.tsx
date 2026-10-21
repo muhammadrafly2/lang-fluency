@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { 
-  Sparkles, Zap, LayoutGrid, AudioLines, Award, Trophy, TrendingUp, Settings as SettingsIcon 
+  Sparkles, Zap, LayoutGrid, AudioLines, Award, Trophy, TrendingUp, 
+  Settings as SettingsIcon, ChevronDown, Globe, BookOpen, Flame
 } from "lucide-react";
 
 import { 
@@ -23,6 +24,14 @@ import { VocalWarmupModal } from "@/components/VocalWarmupModal";
 import { CustomScenarioStudioModal } from "@/components/CustomScenarioStudioModal";
 import { SettingsModal } from "@/components/SettingsModal";
 import { HomeLanguageStudyHub } from "@/components/HomeLanguageStudyHub";
+import { 
+  LanguageSelectionSheet, 
+  SUPPORTED_LANGUAGES, 
+  SupportedLanguageOption 
+} from "@/components/LanguageSelectionSheet";
+import { WelcomeOnboardingModal } from "@/components/WelcomeOnboardingModal";
+import { CleanHomeDashboard } from "@/components/CleanHomeDashboard";
+import { getCoachPersona } from "@/utils/coachPersonas";
 
 // Initial Catalog of Scenarios per PRD specifications
 const INITIAL_SCENARIOS: Scenario[] = [
@@ -147,6 +156,250 @@ const INITIAL_SCENARIOS: Scenario[] = [
     starterPrompt: "弊社のマルチモーダルAIプラットフォームは、導入企業の顧客オンボーディング期間を70%短縮し、業界屈指の実績を達成しております。",
     aiFirstMessage: "ご説明ありがとうございます。数字の伸びは大変魅力的ですが、米系メガテック企業が同様の音声モデルを投入してきた場合、貴社はどのように差別化と参入障壁を担保されるお考えでしょうか？",
   },
+  // ── French Learning Scenarios (Français) ──
+  {
+    id: "cafe-paris",
+    title: "Café & Bistrot de Paris (Ordering & Small Talk)",
+    subtitle: "Conversation quotidienne & bistrot parisien",
+    category: "Daily Life",
+    difficulty: "Easy",
+    xpReward: 60,
+    cefrLevel: "B1",
+    durationMinutes: 6,
+    imageUrl: "/small-talk.png",
+    description: "Pratiquez la commande d'un café et de croissants dans un bistrot parisien avec aisance et politesse naturelle.",
+    keySkills: ["Politesse parisienne", "Formules de commande", "Vocabulaire café", "Intonation française"],
+    starterPrompt: "Bonjour ! Je voudrais un café crème et un croissant au beurre s'il vous plaît.",
+    aiFirstMessage: "Bonjour ! Très bien, un café crème et un croissant bien chaud. Vous préférez vous installer en terrasse ou en salle ?",
+  },
+  {
+    id: "paris-metro-rer",
+    title: "Metro & TGV Grève (Transit Friction & Alternatives)",
+    subtitle: "Imprévus et transports parisiens",
+    category: "Travel",
+    difficulty: "Medium",
+    xpReward: 90,
+    cefrLevel: "B2",
+    durationMinutes: 8,
+    imageUrl: "/coffee-twist.jpg",
+    description: "Gérer un retard inattendu sur la ligne 1 du métro ou une perturbation du RER à la Gare de Lyon.",
+    keySkills: ["Gestion d'imprévus", "Demande d'itinéraire", "Conditionnel de politesse", "Vocabulaire RATP/SNCF"],
+    starterPrompt: "Pardonnez-moi, le train pour Lyon semble retardé de quarante minutes. Est-il possible de monter dans le TGV précédent ?",
+    aiFirstMessage: "Bonjour monsieur. En effet, nous avons une panne de signalisation sur la voie 2. Pourriez-vous me montrer votre billet de réservation s'il vous plaît ?",
+  },
+  {
+    id: "paris-tech-standup",
+    title: "Station F Tech Standup (Agile Engineering)",
+    subtitle: "Sprint Delivery & Synchronisation Technique",
+    category: "Career & Tech",
+    difficulty: "Hard",
+    xpReward: 120,
+    cefrLevel: "C1",
+    durationMinutes: 10,
+    imageUrl: "/tech-standup.png",
+    description: "Participer à un standup d'ingénieurs à la Station F : expliquer un point de blocage sur l'API et négocier une mise en production.",
+    keySkills: ["Jargon tech français", "Explication de bloqueurs", "Négociation de sprint", "Précision technique"],
+    starterPrompt: "Hier j'ai finalisé le déploiement de l'API de streaming. Aujourd'hui, je suis ralenti par la latence du microservice d'authentification.",
+    aiFirstMessage: "Bonjour l'équipe. Rafly, merci pour le retour. Est-ce que tu as déjà partagé les métriques de latence avec l'équipe DevOps pour qu'on puisse avancer ?",
+  },
+  {
+    id: "paris-pitch-stationf",
+    title: "Station F Pitch & Négociation (Executive VC)",
+    subtitle: "Levée de fonds et défense de valorisation",
+    category: "Debate & Pitch",
+    difficulty: "Master",
+    xpReward: 200,
+    cefrLevel: "C2",
+    durationMinutes: 15,
+    imageUrl: "/startup-pitch.jpg",
+    description: "Défendre la valorisation de sa startup face à des investisseurs parisiens exigeants lors d'un tour de table Series A.",
+    keySkills: ["Rhétorique exécutive", "Défense de barrières à l'entrée", "Négociation de valorisation", "Persuasion stratégique"],
+    starterPrompt: "Notre plateforme génère une rétention nette de 45% mois après mois et possède une avance technologique décisive sur les modèles ouverts.",
+    aiFirstMessage: "Vos métriques d'acquisition sont séduisantes, mais comment protégez-vous vos marges face à la commoditisation accélérée de l'IA générative ?",
+  },
+  // ── Korean Learning Scenarios (한국어) ──
+  {
+    id: "hongdae-cafe",
+    title: "홍대 카페 주문 및 일상 대화 (Hongdae Café Banter)",
+    subtitle: "자연스러운 주문과 음료 커스터마이징",
+    category: "Daily Life",
+    difficulty: "Easy",
+    xpReward: 60,
+    cefrLevel: "B1",
+    durationMinutes: 6,
+    imageUrl: "/small-talk.png",
+    description: "홍대 감성 카페에서 아이스 아메리카노와 디저트를 주문하고 직원과 자연스러운 일상 대화를 나누는 실전 롤플레이.",
+    keySkills: ["해요체 존댓말", "주문 표현", "음료 옵션 요청", "한국어 자연스러운 억양"],
+    starterPrompt: "안녕하세요, 아이스 아메리카노 한 잔 연하게 테이크아웃 부탁드려요.",
+    aiFirstMessage: "안녕하세요! 네, 아이스 아메리카노 연하게 한 잔 테이크아웃 준비해 드릴게요. 원두는 고소한 맛과 산미 있는 맛 중 어느 쪽으로 해드릴까요?",
+  },
+  {
+    id: "seoul-subway",
+    title: "서울 지하철 환승 및 교통 카드 트러블 (Seoul Metro Trouble)",
+    subtitle: "교통카드 오류와 역무원 문의",
+    category: "Travel",
+    difficulty: "Medium",
+    xpReward: 90,
+    cefrLevel: "B2",
+    durationMinutes: 8,
+    imageUrl: "/coffee-twist.jpg",
+    description: "서울역 1호선 환승 개표구에서 교통카드 태그 오류 시 역무원에게 정중하게 상황을 설명하고 해결하는 롤플레이.",
+    keySkills: ["상황 설명하기", "요청하기 (-아/어 주시겠어요?)", "교통 어휘", "정중한 대화"],
+    starterPrompt: "죄송한데요, 환승 카드를 찍었는데 오류가 나서 개표구가 열리지 않아요. 확인해 주실 수 있나요?",
+    aiFirstMessage: "아, 그러셨군요. 카드 한 번 보여주시겠어요? 직전 정거장에서 하차 처리가 정상적으로 되지 않은 것 같네요.",
+  },
+  {
+    id: "pangyo-tech-standup",
+    title: "판교 IT 테크 스탠드업 (Pangyo Agile Standup)",
+    subtitle: "스프린트 지연 이슈 및 API 아키텍처 보고",
+    category: "Career & Tech",
+    difficulty: "Hard",
+    xpReward: 120,
+    cefrLevel: "C1",
+    durationMinutes: 10,
+    imageUrl: "/tech-standup.png",
+    description: "판교 테크노밸리 IT 기업에서 데일리 스크럼에 참여하여 실시간 스트리밍 지연 이슈와 해결 방안을 보고하는 비즈니스 한국어 롤플레이.",
+    keySkills: ["비즈니스 어휘", "블로커 설명", "기술적 의사소통", "협업 조율"],
+    starterPrompt: "어제 토큰 스트리밍 최적화 작업을 마쳤고, 오늘은 인증 서비스 지연 이슈를 파악하고 있습니다.",
+    aiFirstMessage: "라플리 님 수고 많으셨습니다. 인증 서비스 지연 건은 백엔드 인프라 팀과 일정 조율이 완료되었을까요?",
+  },
+  {
+    id: "gangnam-pitch",
+    title: "강남 테헤란로 스타트업 투자 피칭 (Teheran-ro VC Pitch)",
+    subtitle: "VC 질의응답 및 BM 방어",
+    category: "Debate & Pitch",
+    difficulty: "Master",
+    xpReward: 200,
+    cefrLevel: "C2",
+    durationMinutes: 15,
+    imageUrl: "/startup-pitch.jpg",
+    description: "강남 벤처캐피털 투자 심사역 앞에서 AI 스타트업의 수익 모델과 독점적 해자를 논리정연하게 방어하는 최고급 한국어 피칭.",
+    keySkills: ["고급 비즈니스 한국어", "투자 유치 논리", "질의응답 방어", "전문 용어 구사"],
+    starterPrompt: "저희 멀티모달 음성 엔진은 높은 사용자 유지율을 바탕으로 이미 확실한 시장 지배력을 확보하고 있습니다.",
+    aiFirstMessage: "초기 지표는 매우 긍정적입니다만, 글로벌 빅테크 기업들이 유사한 모델을 무료로 배포할 경우 어떤 전략으로 해자를 지켜내실 계획인가요?",
+  },
+  // ── German Learning Scenarios (Deutsch) ──
+  {
+    id: "berlin-cafe",
+    title: "Berliner Bäckerei & Café Bestellung (Bakery Banter)",
+    subtitle: "Alltagskommunikation im Café",
+    category: "Daily Life",
+    difficulty: "Easy",
+    xpReward: 60,
+    cefrLevel: "B1",
+    durationMinutes: 6,
+    imageUrl: "/small-talk.png",
+    description: "Bestellen Sie Kaffee und frische Brötchen in einer Berliner Bäckerei mit natürlicher Höflichkeit.",
+    keySkills: ["Höfliche Bitten", "Kaffee- und Bäckerei-Wortschatz", "Akkusativ-Objekte", "Berliner Gelassenheit"],
+    starterPrompt: "Guten Tag! Ich hätte gerne einen Cappuccino mit Hafermilch und zwei Dinkelbrötchen zum Mitnehmen, bitte.",
+    aiFirstMessage: "Guten Tag! Sehr gerne. Möchten Sie die Brötchen gleich belegt haben, oder einfach so eingepackt?",
+  },
+  {
+    id: "bahn-verspaetung",
+    title: "Deutsche Bahn Zugausfall & Umbuchung (DB Travel Friction)",
+    subtitle: "Fahrkartenumtausch und Reisealternativen",
+    category: "Travel",
+    difficulty: "Medium",
+    xpReward: 90,
+    cefrLevel: "B2",
+    durationMinutes: 8,
+    imageUrl: "/coffee-twist.jpg",
+    description: "Am Hauptbahnhof Schalter eine spontane Alternative für einen ausgefallenen ICE verhandeln.",
+    keySkills: ["Beschwerde und Lösung", "Konjunktiv II", "Bahn-Wortschatz", "Sachliche Durchsetzungsstärke"],
+    starterPrompt: "Entschuldigung, mein ICE nach München fällt leider aus. Könnten Sie meine Sitzplatzreservierung bitte auf den nächsten Zug umbuchen?",
+    aiFirstMessage: "Guten Tag. Ja, wegen einer Weichenstörung ist der Zug leider entfallen. Lassen Sie mich kurz Ihr Ticket einscannen.",
+  },
+  {
+    id: "berlin-tech-standup",
+    title: "Berlin Tech Standup & Sprint Sync (Agile German)",
+    subtitle: "Blocker-Analyse und API-Architektur",
+    category: "Career & Tech",
+    difficulty: "Hard",
+    xpReward: 120,
+    cefrLevel: "C1",
+    durationMinutes: 10,
+    imageUrl: "/tech-standup.png",
+    description: "In einem Berliner Tech-Startup im Daily Standup über Sprint-Blocker, Latenz und Deployment-Pipelines berichten.",
+    keySkills: ["Agile Fachsprache", "Präzise Problembeschreibung", "Teamabstimmung", "Technisches Deutsch"],
+    starterPrompt: "Gestern habe ich das Refactoring der Streaming-Pipeline abgeschlossen. Heute hänge ich leider an der Latenz des Auth-Endpoints.",
+    aiFirstMessage: "Morgen zusammen. Danke für das Update, Rafly. Hast du das Problem schon im DevOps-Channel angesprochen?",
+  },
+  {
+    id: "frankfurt-pitch",
+    title: "Frankfurt Executive Pitch & B2B Verhandlung (Enterprise Deal)",
+    subtitle: "DSGVO-Compliance und B2B-Preismodell",
+    category: "Debate & Pitch",
+    difficulty: "Master",
+    xpReward: 200,
+    cefrLevel: "C2",
+    durationMinutes: 15,
+    imageUrl: "/startup-pitch.jpg",
+    description: "Verhandeln Sie vor deutschen Vorständen und VCs über Datenschutz, DSGVO-Sicherheit und Enterprise-Verträge.",
+    keySkills: ["Gehobene Verhandlungssprache", "DSGVO-Argumentation", "Souveräne Einwandbehandlung", "B2B-Abschlusskompetenz"],
+    starterPrompt: "Unsere Architektur ist vollständig DSGVO-konform und garantiert On-Premise-Datensicherheit bei höchster Skalierbarkeit.",
+    aiFirstMessage: "Das Sicherheitskonzept klingt durchdacht. Wie sieht jedoch Ihre vertragliche Haftung im Falle von unerwarteten Latenzspitzen aus?",
+  },
+  // ── Spanish Learning Scenarios (Español) ──
+  {
+    id: "tapas-madrid",
+    title: "Tapeo y Pedidos en Madrid (Tapas Bar Banter)",
+    subtitle: "Conversación fluida y vida social en el bar",
+    category: "Daily Life",
+    difficulty: "Easy",
+    xpReward: 60,
+    cefrLevel: "B1",
+    durationMinutes: 6,
+    imageUrl: "/small-talk.png",
+    description: "Pide tapas tradicionales en el centro de Madrid, interactúa con el camarero y pide la cuenta separada.",
+    keySkills: ["Español coloquial", "Pedidos y comida", "Trato de tú y cortesía", "Expresiones cotidianas"],
+    starterPrompt: "¡Hola buenas! ¿Nos pones una caña bien tirada, una de bravas y media de tortilla por favor?",
+    aiFirstMessage: "¡Buenas! Marchando esa caña bien fría. ¿Las bravas las queréis con la salsa picante tradicional o más suave?",
+  },
+  {
+    id: "renfe-incidencia",
+    title: "Incidencia y Cambio de Billete Renfe AVE (Renfe Transit Trouble)",
+    subtitle: "Gestión de retrasos y cambios en ventanilla",
+    category: "Travel",
+    difficulty: "Medium",
+    xpReward: 90,
+    cefrLevel: "B2",
+    durationMinutes: 8,
+    imageUrl: "/coffee-twist.jpg",
+    description: "Gestiona en la estación de Atocha el cambio de billete tras la pérdida o retraso de un tren AVE.",
+    keySkills: ["Resolución de incidencias", "Condicional de cortesía", "Léxico ferroviario", "Asertividad calmada"],
+    starterPrompt: "Buenas tardes, acabo de perder el AVE con destino a Barcelona por un retraso del metro. ¿Sería posible cambiar mi billete al siguiente tren?",
+    aiFirstMessage: "Buenas tardes. Déjeme ver su billete y localizador, por favor. Vamos a comprobar las plazas libres en el tren de las 18:30.",
+  },
+  {
+    id: "madrid-tech-standup",
+    title: "Standup Técnico en Startup de Madrid (Agile Standup)",
+    subtitle: "Despliegue y latencia de endpoints",
+    category: "Career & Tech",
+    difficulty: "Hard",
+    xpReward: 120,
+    cefrLevel: "C1",
+    durationMinutes: 10,
+    imageUrl: "/tech-standup.png",
+    description: "Participa en el standup diario de una tecnológica en Madrid explicando bloqueos de infraestructura y plazos de entrega.",
+    keySkills: ["Jerga tech en español", "Explicación de cuellos de botella", "Coordinación ágil", "Negociación de plazos"],
+    starterPrompt: "Ayer completé la integración de WebSockets para el streaming. Hoy estoy bloqueado con los tiempos de respuesta del endpoint de autenticación.",
+    aiFirstMessage: "¡Hola equipo! Bien visto ese avance con WebSockets, Rafly. ¿Has podido revisar los logs de staging con la gente de sistemas?",
+  },
+  {
+    id: "latam-pitch",
+    title: "Pitch de Inversión y Negociación B2B (VC Investment Pitch)",
+    subtitle: "Estrategia de tracción y expansión regional",
+    category: "Debate & Pitch",
+    difficulty: "Master",
+    xpReward: 200,
+    cefrLevel: "C2",
+    durationMinutes: 15,
+    imageUrl: "/startup-pitch.jpg",
+    description: "Defiende tu valoración y tracción empresarial ante inversores de capital riesgo en un pitch de alta exigencia.",
+    keySkills: ["Elocuencia ejecutiva", "Defensa de ventajas competitivas", "Tracción y CAC/LTV", "Negociación estratégica"],
+    starterPrompt: "Nuestra tecnología ha alcanzado un ratio de retención neta del 40% mensual con una estructura de costes sumamente eficiente.",
+    aiFirstMessage: "Sus cifras de crecimiento son interesantes, pero ¿cómo piensan defender su cuota de mercado cuando los gigantes tecnológicos liberen modelos similares?",
+  },
 ];
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -247,9 +500,14 @@ export default function FluencyAIPage() {
     setIsClientMounted(true);
     try {
       const saved = localStorage.getItem("fluency_settings");
+      const hasChosen = localStorage.getItem("fluency_has_chosen_language");
       if (saved) {
         const parsed = JSON.parse(saved);
         setSettings((prev) => ({ ...prev, ...parsed }));
+      }
+      if (!hasChosen) {
+        // First-time language selection requirement per prompt
+        setIsLanguageSheetOpen(true);
       }
     } catch {}
   }, []);
@@ -266,9 +524,40 @@ export default function FluencyAIPage() {
     }
   }, []);
 
+  // Language Selection Sheet & Onboarding Modal state
+  const [isLanguageSheetOpen, setIsLanguageSheetOpen] = useState(false);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+
+  // Active language option matching mockup
+  const currentLanguageOption: SupportedLanguageOption =
+    SUPPORTED_LANGUAGES.find((l) => l.code === settings.targetLanguage) ||
+    SUPPORTED_LANGUAGES[0];
+
+  const handleSelectLanguageOption = (lang: SupportedLanguageOption) => {
+    const targetLanguage = lang.code;
+    const recognitionLang = lang.recognitionLang || (lang.code === "japanese" ? "ja-JP" : "en-US");
+    setSettings((prev) => {
+      const updated: AppSettings = {
+        ...prev,
+        targetLanguage,
+        recognitionLang,
+        ttsVoiceURI: "",
+      };
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("fluency_settings", JSON.stringify(updated));
+          localStorage.setItem("fluency_has_chosen_language", "true");
+        } catch {}
+      }
+      return updated;
+    });
+    setIsLanguageSheetOpen(false);
+  };
+
   // Handle language selection from Home screen or header
-  const handleSelectLanguage = (lang: "english" | "japanese") => {
-    const recognitionLang = lang === "japanese" ? "ja-JP" : "en-US";
+  const handleSelectLanguage = (lang: string) => {
+    const opt = SUPPORTED_LANGUAGES.find((l) => l.code === lang);
+    const recognitionLang = opt?.recognitionLang || (lang === "japanese" ? "ja-JP" : "en-US");
     setSettings((prev) => {
       const updated: AppSettings = {
         ...prev,
@@ -291,22 +580,24 @@ export default function FluencyAIPage() {
     setIsCallModalOpen(true);
   };
 
-  // Launch Free Call with Coach Elena
+  // Launch Free Call with Coach
   const handleStartFreeCall = () => {
+    const coachPersona = getCoachPersona(settings.targetLanguage, settings.ttsVoiceURI);
+    const firstName = coachPersona.name.split(" ")[0];
     const freeCallScenario: Scenario = {
-      id: "free-call-elena",
-      title: "Elena AI Coach Free Call",
+      id: `free-call-${settings.targetLanguage}`,
+      title: `${firstName} AI Coach Free Call`,
       subtitle: "Spontaneous Verbal Dialogue",
       category: "Daily Life",
       difficulty: "Medium",
       xpReward: 90,
       cefrLevel: "C1",
       durationMinutes: 10,
-      imageUrl: "/elena-coach.jpg",
-      description: "Low-latency free conversation with Coach Elena. Test spontaneous fluency on any topic with instant phonetic analysis.",
+      imageUrl: coachPersona.avatarUrl,
+      description: `Low-latency free conversation with Coach ${firstName}. Test spontaneous fluency on any topic with instant phonetic analysis.`,
       keySkills: ["Spontaneous Fluency", "Pronunciation", "Natural Banter"],
-      starterPrompt: "Hey Elena! Let's do a freeform practice session today.",
-      aiFirstMessage: "Hi Rafly! It's great to hear your voice. What topic or challenge shall we dive into today?",
+      starterPrompt: "Let's do a freeform practice session today.",
+      aiFirstMessage: coachPersona.sampleText,
     };
     handleStartCall(freeCallScenario);
   };
@@ -349,7 +640,7 @@ export default function FluencyAIPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-white flex flex-col justify-between pb-24 selection:bg-cyan-400 selection:text-black">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col justify-between pb-24 selection:bg-emerald-200 selection:text-emerald-950 font-[var(--font-poppins)]">
       {/* ── Apple Dynamic Island Achievement Toast ── */}
       <DynamicIslandNotification
         streak={streakDays}
@@ -358,70 +649,62 @@ export default function FluencyAIPage() {
         onOpenCall={handleStartFreeCall}
       />
 
-      {/* ── App Top Header ── */}
-      <header className="sticky top-0 z-40 w-full bg-[#070b14]/90 backdrop-blur-md border-b border-white/5 py-3">
+      {/* ── App Top Header (Clean Light Theme matching mockup) ── */}
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 py-3 shadow-xs">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           {/* Logo & Subtitle */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center shadow-[0_0_20px_rgba(0,229,255,0.35)]">
-              <Sparkles size={18} className="text-[#00e5ff]" />
+            <div className="w-9 h-9 rounded-2xl bg-[#0f4a3c] text-white flex items-center justify-center shadow-sm">
+              <span className="font-space font-extrabold text-lg">M</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-base font-space font-extrabold text-white leading-tight tracking-tight">
-                Fluency AI
+              <span className="text-base font-space font-extrabold text-slate-900 leading-tight tracking-tight">
+                Mingle Fluency
               </span>
-              <span className="text-[10px] font-mono font-bold tracking-widest text-[#00e5ff] uppercase">
-                {activeTab === "quests" || activeTab === "arena" ? "QUESTS & ARENAS" : "AI ROLEPLAY"}
+              <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-700 uppercase">
+                {activeTab === "quests" || activeTab === "arena" ? "QUESTS & ARENAS" : "AI VOICE COACH"}
               </span>
             </div>
           </div>
 
           {/* User Stats & Language & Profile Avatar */}
           <div className="flex items-center gap-2 sm:gap-2.5">
-            {/* Quick Language Toggle Pill */}
-            <div className="p-0.5 rounded-full bg-[#131a27] border border-slate-800 flex items-center shadow-sm">
-              <button
-                onClick={() => handleSelectLanguage("english")}
-                className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1 ${
-                  settings.targetLanguage === "english"
-                    ? "bg-[#00e5ff] text-slate-950 shadow-[0_0_10px_rgba(0,229,255,0.4)]"
-                    : "text-slate-400 hover:text-white"
-                }`}
-                title="Study English"
-              >
-                <span>🇺🇸</span>
-                <span className="hidden sm:inline">EN</span>
-              </button>
-              <button
-                onClick={() => handleSelectLanguage("japanese")}
-                className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1 ${
-                  settings.targetLanguage === "japanese"
-                    ? "bg-rose-500 text-white shadow-[0_0_10px_rgba(244,63,94,0.4)]"
-                    : "text-slate-400 hover:text-white"
-                }`}
-                title="Study Japanese (日本語)"
-              >
-                <span>🇯🇵</span>
-                <span className="hidden sm:inline">JA</span>
-              </button>
-            </div>
+            {/* Quick Language Selection Button -> Opens Screen 3 Language Selection Sheet */}
+            <button
+              onClick={() => setIsLanguageSheetOpen(true)}
+              className="px-3 py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 transition-all flex items-center gap-2 shadow-xs cursor-pointer group"
+              title="Click to select study language"
+            >
+              <span className="text-base">{currentLanguageOption.flag}</span>
+              <span className="hidden sm:inline font-semibold">{currentLanguageOption.name.split(" ")[0]}</span>
+              <ChevronDown size={14} className="text-slate-400 group-hover:text-slate-700" />
+            </button>
 
-            {/* Streak Pill */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#131a27] border border-slate-800 text-xs font-semibold text-white shadow-sm">
-              <span>🔥</span>
-              <span className="text-white font-bold">{streakDays}d</span>
+            {/* Welcome Tour Button */}
+            <button
+              onClick={() => setIsWelcomeModalOpen(true)}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold transition-colors cursor-pointer"
+            >
+              <Sparkles size={13} className="text-emerald-600" />
+              <span>Tour</span>
+            </button>
+
+            {/* Streak Pill matching image: 🔥 12 */}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 border border-orange-200 text-xs font-semibold text-orange-700 shadow-xs">
+              <Flame size={14} className="text-orange-500 fill-orange-500" />
+              <span className="font-bold">{streakDays}</span>
             </div>
 
             {/* XP / Points Pill */}
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#131a27] border border-slate-800 text-xs font-semibold shadow-sm">
-              <span className="text-amber-400">✨</span>
-              <span className="text-[#00e5ff] font-bold">{userXp.toLocaleString()}</span>
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 shadow-xs">
+              <span className="text-amber-500">✨</span>
+              <span className="font-bold">{userXp.toLocaleString()}</span>
             </div>
 
             {/* Profile Avatar */}
             <button
               onClick={() => setIsSettingsModalOpen(true)}
-              className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#00e5ff] hover:border-cyan-300 transition-colors shrink-0 shadow-[0_0_12px_rgba(0,229,255,0.4)] ml-0.5"
+              className="w-9 h-9 rounded-full overflow-hidden border-2 border-emerald-600 hover:border-emerald-700 transition-colors shrink-0 shadow-sm ml-0.5 cursor-pointer"
               title="Settings & Profile"
             >
               <img src="/aura-avatar.png" alt="Profile" className="w-full h-full object-cover" />
@@ -431,7 +714,7 @@ export default function FluencyAIPage() {
       </header>
 
       {/* ── Main Viewports by Tab (Full Desktop max-w-6xl & Responsive Mobile) ── */}
-      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 pt-6 pb-28 flex-1 flex flex-col gap-6">
+      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 pt-6 pb-36 flex-1 flex flex-col gap-6">
         {/* Tab: Talk (AI Roleplay & Scenario Hub) */}
         {(activeTab === "talk" || activeTab === "scenarios") && (
           <ScenarioHubView
@@ -440,16 +723,18 @@ export default function FluencyAIPage() {
             onOpenWarmup={() => setIsWarmupModalOpen(true)}
             onOpenStudio={() => setIsStudioModalOpen(true)}
             onStartFreeCall={handleStartFreeCall}
+            targetLanguage={settings.targetLanguage}
+            ttsVoiceURI={settings.ttsVoiceURI}
           />
         )}
 
         {/* Tab: Today / Home Fluency Dashboard */}
         {activeTab === "today" && (
           <div className="flex flex-col gap-8 animate-slide-up-fade">
-            {/* Step 1: Language Study Selector -> Step 2: Available AI Voice -> Step 3: Adjusted Roadmap */}
-            <HomeLanguageStudyHub
-              selectedLanguage={settings.targetLanguage === "japanese" ? "japanese" : "english"}
-              onSelectLanguage={handleSelectLanguage}
+            {/* Screen 2: Clean Fun Learning Dashboard matching layout & colors */}
+            <CleanHomeDashboard
+              currentLanguage={currentLanguageOption}
+              onOpenLanguageSheet={() => setIsLanguageSheetOpen(true)}
               onStartCall={(scenarioId) => {
                 if (scenarioId) {
                   const match = scenarios.find(
@@ -462,34 +747,42 @@ export default function FluencyAIPage() {
                 }
                 handleStartFreeCall();
               }}
-              onNavigateToMastery={() => setActiveTab("mastery")}
+              onOpenSettings={() => setIsSettingsModalOpen(true)}
+              onNavigateTab={(tab) => setActiveTab(tab as TabType)}
+              streakDays={streakDays}
+              userXp={userXp}
+              userGems={userGems}
               ttsVoices={ttsVoices}
               ttsVoiceURI={settings.ttsVoiceURI}
             />
 
-            {/* Daily Core Rings Telemetry */}
-            <FluencyCoreRings
-              data={ringData}
-              onOpenLiveSession={handleStartFreeCall}
-            />
+            {/* Quick Practice & Progression Rings section */}
+            <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
+              <FluencyCoreRings
+                data={ringData}
+                onOpenLiveSession={handleStartFreeCall}
+              />
 
-            {/* Streak Vault & Daily Targets */}
-            <StreakVaultCard
-              data={streakVault}
-              onClaimReward={() => {
-                setUserXp((prev) => prev + 250);
-                setUserGems((prev) => prev + 50);
-                setStreakVault((prev) => ({ ...prev, chestClaimed: true }));
-              }}
-            />
-            <DailyTargetWidgets
-              targets={dailyTargets}
-              onActionClick={handleTargetAction}
-            />
-            <NextUpRecommendations
-              scenarios={scenarios.slice(0, 3)}
-              onSelectScenario={handleStartCall}
-            />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <StreakVaultCard
+                  data={streakVault}
+                  onClaimReward={() => {
+                    setUserXp((prev) => prev + 250);
+                    setUserGems((prev) => prev + 50);
+                    setStreakVault((prev) => ({ ...prev, chestClaimed: true }));
+                  }}
+                />
+                <DailyTargetWidgets
+                  targets={dailyTargets}
+                  onActionClick={handleTargetAction}
+                />
+              </div>
+
+              <NextUpRecommendations
+                scenarios={scenarios.slice(0, 3)}
+                onSelectScenario={handleStartCall}
+              />
+            </div>
           </div>
         )}
 
@@ -516,7 +809,7 @@ export default function FluencyAIPage() {
         {/* Tab: Mastery */}
         {activeTab === "mastery" && (
           <MasteryView
-            initialLanguage={settings.targetLanguage === "japanese" ? "japanese" : "english"}
+            initialLanguage={settings.targetLanguage}
             onLanguageChange={handleSelectLanguage}
             onLaunchNodeScenario={(titleOrId) => {
               const match = scenarios.find(
@@ -528,8 +821,8 @@ export default function FluencyAIPage() {
         )}
       </main>
 
-      {/* ── Apple HIG Frosted Glass Bottom Navigation Dock ── */}
-      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-md glass-dock rounded-3xl p-2 flex items-center justify-around border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.8)]">
+      {/* ── Apple HIG Clean Glass Bottom Navigation Dock ── */}
+      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-md bg-white/95 backdrop-blur-xl rounded-3xl p-2 flex items-center justify-around border border-slate-200/90 shadow-[0_12px_36px_rgba(15,74,60,0.12)]">
         {[
           { id: "today", label: "Home", icon: LayoutGrid },
           { id: "talk", label: "Talk", icon: AudioLines },
@@ -546,11 +839,11 @@ export default function FluencyAIPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id as TabType)}
               className={`flex-1 py-1.5 px-3 rounded-2xl flex flex-col items-center gap-1 transition-all duration-300 relative ${
-                isActive ? "text-[#00e5ff] font-bold" : "text-slate-400 hover:text-white"
+                isActive ? "text-[#0f4a3c] font-bold" : "text-slate-400 hover:text-slate-700"
               }`}
             >
               {isActive ? (
-                <div className="w-8 h-8 rounded-full bg-cyan-500/20 text-[#00e5ff] flex items-center justify-center shadow-[0_0_15px_rgba(0,229,255,0.45)]">
+                <div className="w-8 h-8 rounded-full bg-emerald-50 text-[#0f4a3c] flex items-center justify-center shadow-xs">
                   <Icon size={17} />
                 </div>
               ) : (
@@ -560,7 +853,7 @@ export default function FluencyAIPage() {
               )}
               <span
                 className={`text-[10px] tracking-wide ${
-                  isActive ? "font-bold text-[#00e5ff]" : "font-medium text-slate-400"
+                  isActive ? "font-bold text-[#0f4a3c]" : "font-medium text-slate-500"
                 }`}
               >
                 {tab.label}
@@ -617,6 +910,24 @@ export default function FluencyAIPage() {
           localStorage.setItem("fluency_settings", JSON.stringify(settings));
           setIsSettingsModalOpen(false);
         }}
+      />
+
+      {/* ── Screen 3: Language Selection Sheet (Lessons Modal) ── */}
+      <LanguageSelectionSheet
+        isOpen={isLanguageSheetOpen}
+        onClose={() => setIsLanguageSheetOpen(false)}
+        currentLanguage={settings.targetLanguage}
+        onSelectLanguage={handleSelectLanguageOption}
+      />
+
+      {/* ── Screen 1: Welcome Onboarding Modal ("Master a new language in just minutes a day") ── */}
+      <WelcomeOnboardingModal
+        isOpen={isWelcomeModalOpen}
+        onGetStarted={() => {
+          setIsWelcomeModalOpen(false);
+          setIsLanguageSheetOpen(true);
+        }}
+        onContinue={() => setIsWelcomeModalOpen(false)}
       />
     </div>
   );
