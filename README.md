@@ -190,6 +190,15 @@ fluent-ai/
 3. **Section 3: ビジネスIT・開発現場の対話 (Agile Tech Workplace)** — Daily standups, blocker escalations, release timeline advancement (前倒し).
 4. **Section 4: 経営陣ピッチ・高度価格交渉 (Executive Pitch & Keigo)** — Formal Keigo (Sonkeigo/Kenjougo), value proposition defense, concession bargaining.
 
+#### 🌸 Core Japanese Learning Modules & Topics
+Along with the 4 roadmap sections, the app features 6 dedicated learning modules with audio playback and drills:
+- **あ Hiragana & Katakana**: Explore Japanese characters, numbers (1-10,000), time expressions (`〜時〜分`), and calendar days.
+- **文 Grammar & Conjugation**: 7 vital particles (`は, が, を, に, で, へ, と`), key sentence patterns (`〜てください, 〜てもいいですか, 〜なければならない`), and Godan/Ichidan/Irregular verb conjugation groups.
+- **N JLPT N5–N1 Practice**: Level breakdown matrix (kanji, vocab, grammar goals) and sample diagnostic questions with instant explanations.
+- **▶ Video Lessons**: Explanations of Japanese sounds, Tokyo pitch accent contours (頭高, 平板, 中高, 尾高), mora timing, and natural Aizuchi fillers.
+- **和 Culture & Communication**: Everyday etiquette, bowing angles (15° 会釈, 30° 敬礼, 45° 最敬礼), business card exchange (名刺交換), and Sonkeigo vs Kenjougo cheat sheets.
+- **✓ Study Tips**: The 4-step shadowing protocol, the 15-minute daily verbal output habit, active sentence mining, and psychological safety in speaking.
+
 ---
 
 ## 🔒 Privacy & Security

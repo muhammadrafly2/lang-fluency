@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { ConstellationNode, RoadmapSection } from "@/types";
 import { JAPANESE_COURSE_ROADMAP, ENGLISH_COURSE_ROADMAP } from "@/data/learningRoadmaps";
+import { JapaneseTopicModules } from "./JapaneseTopicModules";
 
 interface MasteryViewProps {
   onLaunchNodeScenario: (nodeTitle: string) => void;
@@ -205,6 +206,13 @@ export function MasteryView({
           })}
         </div>
       </div>
+
+      {/* ── Japanese Core Learning Modules & Topics (when Japanese is active) ── */}
+      {activeLang === "japanese" && (
+        <JapaneseTopicModules
+          onStartScenarioCall={(scenarioId) => onLaunchNodeScenario(scenarioId || "Daily Banter")}
+        />
+      )}
 
       {/* ── SECTION-BY-SECTION LEARNING ROADMAPS ── */}
       <div className="flex flex-col gap-5">

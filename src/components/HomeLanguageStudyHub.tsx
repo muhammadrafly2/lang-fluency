@@ -10,6 +10,7 @@ import {
 import { CourseRoadmap, RoadmapSection, RoadmapStep } from "@/types";
 import { JAPANESE_COURSE_ROADMAP, ENGLISH_COURSE_ROADMAP } from "@/data/learningRoadmaps";
 import { speakElena, selectElenaVoice } from "@/utils/speechEngine";
+import { JapaneseTopicModules } from "./JapaneseTopicModules";
 
 interface HomeLanguageStudyHubProps {
   selectedLanguage: "english" | "japanese";
@@ -252,6 +253,14 @@ export function HomeLanguageStudyHub({
           </button>
         </div>
       </div>
+
+      {/* ── Japanese Core Learning Modules & Topics (when Japanese is active) ── */}
+      {selectedLanguage === "japanese" && (
+        <JapaneseTopicModules
+          onStartScenarioCall={onStartCall}
+          ttsVoiceURI={ttsVoiceURI}
+        />
+      )}
 
       {/* ── Step 3: Active Study Plan & Learning Roadmap ── */}
       <div className="flex flex-col gap-4">
