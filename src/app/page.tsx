@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Sparkles, Zap, LayoutGrid, AudioLines, Award, Trophy, TrendingUp, 
+import {
+  Sparkles, Zap, LayoutGrid, AudioLines, Award, Trophy, TrendingUp,
   Settings as SettingsIcon, ChevronDown, Globe, BookOpen, Flame
 } from "lucide-react";
 
-import { 
-  TabType, Scenario, ActivityRingData, DailyTarget, 
-  StreakVaultData, AppSettings 
+import {
+  TabType, Scenario, ActivityRingData, DailyTarget,
+  StreakVaultData, AppSettings
 } from "@/types";
 
 import { FluencyCoreRings } from "@/components/FluencyCoreRings";
@@ -24,13 +24,14 @@ import { VocalWarmupModal } from "@/components/VocalWarmupModal";
 import { CustomScenarioStudioModal } from "@/components/CustomScenarioStudioModal";
 import { SettingsModal } from "@/components/SettingsModal";
 import { HomeLanguageStudyHub } from "@/components/HomeLanguageStudyHub";
-import { 
-  LanguageSelectionSheet, 
-  SUPPORTED_LANGUAGES, 
-  SupportedLanguageOption 
+import {
+  LanguageSelectionSheet,
+  SUPPORTED_LANGUAGES,
+  SupportedLanguageOption
 } from "@/components/LanguageSelectionSheet";
 import { WelcomeOnboardingModal } from "@/components/WelcomeOnboardingModal";
 import { CleanHomeDashboard } from "@/components/CleanHomeDashboard";
+import { CurriculumExplorerModal } from "@/components/CurriculumExplorerModal";
 import { getCoachPersona } from "@/utils/coachPersonas";
 
 // Initial Catalog of Scenarios per PRD specifications
@@ -489,6 +490,7 @@ export default function FluencyAIPage() {
   const [isWarmupModalOpen, setIsWarmupModalOpen] = useState(false);
   const [isStudioModalOpen, setIsStudioModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isCurriculumModalOpen, setIsCurriculumModalOpen] = useState(false);
 
   // App Settings initialized identically on server and client to avoid SSR hydration mismatch
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -509,7 +511,7 @@ export default function FluencyAIPage() {
         // First-time language selection requirement per prompt
         setIsLanguageSheetOpen(true);
       }
-    } catch {}
+    } catch { }
   }, []);
 
   // Load Voices
@@ -547,7 +549,7 @@ export default function FluencyAIPage() {
         try {
           localStorage.setItem("fluency_settings", JSON.stringify(updated));
           localStorage.setItem("fluency_has_chosen_language", "true");
-        } catch {}
+        } catch { }
       }
       return updated;
     });
@@ -568,7 +570,7 @@ export default function FluencyAIPage() {
       if (typeof window !== "undefined") {
         try {
           localStorage.setItem("fluency_settings", JSON.stringify(updated));
-        } catch {}
+        } catch { }
       }
       return updated;
     });
@@ -655,11 +657,11 @@ export default function FluencyAIPage() {
           {/* Logo & Subtitle */}
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-2xl bg-[#0f4a3c] text-white flex items-center justify-center shadow-sm">
-              <span className="font-space font-extrabold text-lg">M</span>
+              <span className="font-space font-extrabold text-lg">SE</span>
             </div>
             <div className="flex flex-col">
               <span className="text-base font-space font-extrabold text-slate-900 leading-tight tracking-tight">
-                Mingle Fluency
+                SpeakEasy
               </span>
               <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-700 uppercase">
                 {activeTab === "quests" || activeTab === "arena" ? "QUESTS & ARENAS" : "AI VOICE COACH"}
@@ -678,6 +680,16 @@ export default function FluencyAIPage() {
               <span className="text-base">{currentLanguageOption.flag}</span>
               <span className="hidden sm:inline font-semibold">{currentLanguageOption.name.split(" ")[0]}</span>
               <ChevronDown size={14} className="text-slate-400 group-hover:text-slate-700" />
+            </button>
+
+            {/* Curriculum Explorer Button */}
+            <button
+              onClick={() => setIsCurriculumModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0f4a3c] hover:bg-[#0a352a] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              title="Browse 11 Topic Areas & 22 Scenarios"
+            >
+              <BookOpen size={13} />
+              <span className="hidden sm:inline">Curriculum</span>
             </button>
 
             {/* Welcome Tour Button */}
@@ -754,6 +766,7 @@ export default function FluencyAIPage() {
               userGems={userGems}
               ttsVoices={ttsVoices}
               ttsVoiceURI={settings.ttsVoiceURI}
+              onOpenCurriculum={() => setIsCurriculumModalOpen(true)}
             />
 
             {/* Quick Practice & Progression Rings section */}
@@ -838,9 +851,8 @@ export default function FluencyAIPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as TabType)}
-              className={`flex-1 py-1.5 px-3 rounded-2xl flex flex-col items-center gap-1 transition-all duration-300 relative ${
-                isActive ? "text-[#0f4a3c] font-bold" : "text-slate-400 hover:text-slate-700"
-              }`}
+              className={`flex-1 py-1.5 px-3 rounded-2xl flex flex-col items-center gap-1 transition-all duration-300 relative ${isActive ? "text-[#0f4a3c] font-bold" : "text-slate-400 hover:text-slate-700"
+                }`}
             >
               {isActive ? (
                 <div className="w-8 h-8 rounded-full bg-emerald-50 text-[#0f4a3c] flex items-center justify-center shadow-xs">
@@ -852,9 +864,8 @@ export default function FluencyAIPage() {
                 </div>
               )}
               <span
-                className={`text-[10px] tracking-wide ${
-                  isActive ? "font-bold text-[#0f4a3c]" : "font-medium text-slate-500"
-                }`}
+                className={`text-[10px] tracking-wide ${isActive ? "font-bold text-[#0f4a3c]" : "font-medium text-slate-500"
+                  }`}
               >
                 {tab.label}
               </span>
@@ -928,6 +939,27 @@ export default function FluencyAIPage() {
           setIsLanguageSheetOpen(true);
         }}
         onContinue={() => setIsWelcomeModalOpen(false)}
+      />
+
+      {/* ── Screen: 11 Topic Areas Curriculum Explorer Modal ── */}
+      <CurriculumExplorerModal
+        isOpen={isCurriculumModalOpen}
+        onClose={() => setIsCurriculumModalOpen(false)}
+        initialLanguageCode={settings.targetLanguage}
+        ttsVoiceURI={settings.ttsVoiceURI}
+        onStartScenarioCall={(scenarioId) => {
+          setIsCurriculumModalOpen(false);
+          if (scenarioId) {
+            const match = scenarios.find(
+              (s) => s.id === scenarioId || s.title.toLowerCase().includes(scenarioId.toLowerCase())
+            );
+            if (match) {
+              handleStartCall(match);
+              return;
+            }
+          }
+          handleStartFreeCall();
+        }}
       />
     </div>
   );

@@ -42,7 +42,7 @@ export function WelcomeOnboardingModal({
               <span className="text-base">M</span>
             </div>
             <span className="text-lg font-space font-extrabold text-white tracking-tight drop-shadow-md">
-              Mingle Fluency
+              SpeakEasy
             </span>
           </div>
 

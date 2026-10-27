@@ -28,6 +28,7 @@ export interface CleanHomeDashboardProps {
   userGems: number;
   ttsVoices: SpeechSynthesisVoice[];
   ttsVoiceURI?: string;
+  onOpenCurriculum?: () => void;
 }
 
 export function CleanHomeDashboard({
@@ -41,6 +42,7 @@ export function CleanHomeDashboard({
   userGems,
   ttsVoices,
   ttsVoiceURI,
+  onOpenCurriculum,
 }: CleanHomeDashboardProps) {
   // Level filter pill: "all" | "beginner" | "intermediate" | "advanced" | "expert"
   const [activeLevel, setActiveLevel] = useState<string>("beginner");
@@ -214,6 +216,41 @@ export function CleanHomeDashboard({
             <p className="text-xs text-slate-500 font-medium">
               Curriculum adjusted for {currentLanguage.name} • Live verbal practice & active feedback
             </p>
+          </div>
+
+          {/* ── 11 Topic Areas Curriculum Explorer Banner ── */}
+          <div className="w-full bg-gradient-to-r from-[#0f4a3c] via-[#135d4b] to-emerald-800 rounded-3xl p-4 sm:p-5 text-white shadow-md shadow-emerald-950/15 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-emerald-700/50">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl shrink-0 border border-white/20 shadow-inner">
+                📚
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+                    Mastery Syllabus
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-200 text-[10px] font-bold border border-emerald-400/30">
+                    11 Areas • 22 Scenarios
+                  </span>
+                </div>
+                <h3 className="text-sm sm:text-base font-bold text-white mt-0.5">
+                  Explore 11 Native Topic Areas & Realistic Dialogues
+                </h3>
+                <p className="text-[11px] sm:text-xs text-emerald-100/80 mt-0.5 line-clamp-1">
+                  Key chunks, keigo/registers, natural fillers, common mistakes & role-play prompts
+                </p>
+              </div>
+            </div>
+            {onOpenCurriculum && (
+              <button
+                type="button"
+                onClick={onOpenCurriculum}
+                className="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl bg-white hover:bg-emerald-50 text-[#0f4a3c] font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer shrink-0 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <BookOpen size={14} />
+                <span>Browse Curriculum</span>
+              </button>
+            )}
           </div>
 
           {/* ── Grid: Today's Goal & Course Progress (Responsive: 1 col on mobile, 2 col on desktop) ── */}

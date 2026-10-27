@@ -68,20 +68,20 @@ export function JapaneseTopicModules({
       {/* ── Section Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">
             <span>あ</span>
           </div>
           <div>
-            <h3 className="text-base sm:text-lg font-space font-extrabold text-white">
+            <h3 className="text-base sm:text-lg font-space font-extrabold text-slate-900">
               Japanese Learning Modules & Topics
             </h3>
-            <p className="text-xs text-slate-400">
-              Foundational characters, grammar, JLPT practice, culture & study techniques
+            <p className="text-xs text-slate-500">
+              Foundational characters, keigo levels, grammar, aizuchi & cultural etiquette
             </p>
           </div>
         </div>
 
-        <span className="text-[11px] font-mono text-emerald-400/90 bg-emerald-950/60 border border-emerald-500/30 px-2.5 py-0.5 rounded-full self-start sm:self-auto">
+        <span className="text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full self-start sm:self-auto">
           6 Core Modules
         </span>
       </div>
