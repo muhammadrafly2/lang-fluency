@@ -5,17 +5,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, CheckCircle2, Lock, Play, X, BookOpen, Volume2, 
   Clock, Target, ListOrdered, CheckSquare, Dumbbell, Compass, 
-  ChevronDown, ChevronUp, Languages
+  ChevronDown, ChevronUp, Languages, Keyboard
 } from "lucide-react";
 import { ConstellationNode, RoadmapSection } from "@/types";
 import { getCourseRoadmap } from "@/data/learningRoadmaps";
 import { JapaneseTopicModules } from "./JapaneseTopicModules";
 import { LanguageEssentialsModules } from "./LanguageEssentialsModules";
+import { WindingLearningPath } from "./WindingLearningPath";
+import { getPracticeUnitsForLanguage, PracticeUnit } from "@/data/interactivePracticeData";
 
 interface MasteryViewProps {
   onLaunchNodeScenario: (nodeTitle: string) => void;
   initialLanguage?: string;
   onLanguageChange?: (lang: string) => void;
+  onOpenPracticeUnit?: (unit: PracticeUnit) => void;
 }
 
 const ALL_MASTERY_LANGUAGES = [
@@ -30,10 +33,12 @@ const ALL_MASTERY_LANGUAGES = [
 export function MasteryView({ 
   onLaunchNodeScenario, 
   initialLanguage = "japanese",
-  onLanguageChange 
+  onLanguageChange,
+  onOpenPracticeUnit,
 }: MasteryViewProps) {
   const [activeLang, setActiveLang] = useState<string>(initialLanguage);
   const [selectedNode, setSelectedNode] = useState<ConstellationNode | null>(null);
+  const [roadmapViewMode, setRoadmapViewMode] = useState<"path" | "constellation" | "syllabus">("path");
   const [expandedSectionId, setExpandedSectionId] = useState<string>(
     initialLanguage === "japanese" ? "jp-sec-1" : "en-sec-1"
   );
@@ -47,6 +52,7 @@ export function MasteryView({
 
   const currentCourse = getCourseRoadmap(activeLang);
   const constellationNodes = currentCourse.constellationNodes;
+  const practiceUnits = getPracticeUnitsForLanguage(activeLang);
 
   return (
     <div className="flex flex-col gap-6 w-full animate-slide-up-fade">
@@ -118,10 +124,70 @@ export function MasteryView({
         </div>
       </div>
 
-      {/* ── Interactive Visual Constellation Map Canvas ── */}
-      <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm relative overflow-hidden min-h-[360px] flex items-center justify-center">
-        {/* Subtle background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/40 via-white to-white pointer-events-none" />
+      {/* ── View Mode Switcher: Winding Path (Image 1) vs Constellation Map vs Syllabus ── */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-2 bg-white border border-[#e2e8f0] rounded-2xl shadow-xs">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setRoadmapViewMode("path")}
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+              roadmapViewMode === "path"
+                ? "bg-[#58cc02] text-white shadow-sm"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+            }`}
+          >
+            <Compass size={14} />
+            <span>Learning Path (Type & Speak)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setRoadmapViewMode("constellation")}
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+              roadmapViewMode === "constellation"
+                ? "bg-[#0f4a3c] text-white shadow-sm"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+            }`}
+          >
+            <Sparkles size={14} />
+            <span>Constellation Map</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setRoadmapViewMode("syllabus")}
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+              roadmapViewMode === "syllabus"
+                ? "bg-[#0f4a3c] text-white shadow-sm"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+            }`}
+          >
+            <BookOpen size={14} />
+            <span>Detailed Syllabus</span>
+          </button>
+        </div>
+
+        <span className="text-[11px] font-mono font-bold text-slate-400 px-2">
+          {practiceUnits.length} Practice Units Ready
+        </span>
+      </div>
+
+      {/* ── Mode 1: Duolingo-Style Winding Learning Path matching Image 1 ── */}
+      {roadmapViewMode === "path" && (
+        <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm flex flex-col items-center animate-slide-up-fade">
+          <WindingLearningPath
+            units={practiceUnits}
+            onSelectUnit={(unit) => onOpenPracticeUnit?.(unit)}
+            onClaimChest={() => alert("🎉 Bonus Chest Claimed! +50 XP and 20 Gems added to your vault.")}
+          />
+        </div>
+      )}
+
+      {/* ── Mode 2: Interactive Visual Constellation Map Canvas ── */}
+      {roadmapViewMode === "constellation" && (
+        <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm relative overflow-hidden min-h-[360px] flex items-center justify-center animate-slide-up-fade">
+          {/* Subtle background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/40 via-white to-white pointer-events-none" />
 
         {/* Constellation Connecting SVG Lines */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none">
@@ -207,6 +273,7 @@ export function MasteryView({
           })}
         </div>
       </div>
+      )}
 
       {/* ── Language Core Learning Modules & Topics ── */}
       {activeLang === "japanese" ? (
@@ -441,13 +508,32 @@ export function MasteryView({
                             </p>
                           </div>
 
-                          <button
-                            onClick={() => onLaunchNodeScenario(act.scenarioId || act.title)}
-                            className="w-full py-2 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow-sm"
-                          >
-                            <Play size={11} className="fill-purple-500" />
-                            <span>Launch Drill</span>
-                          </button>
+                          <div className="flex items-center gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (practiceUnits.length > 0) {
+                                  onOpenPracticeUnit?.(practiceUnits[0]);
+                                } else {
+                                  onLaunchNodeScenario(act.scenarioId || act.title);
+                                }
+                              }}
+                              className="flex-1 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[#0f4a3c] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow-xs cursor-pointer"
+                            >
+                              <Keyboard size={12} />
+                              <span>Type & Speak</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => onLaunchNodeScenario(act.scenarioId || act.title)}
+                              className="px-3 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition-all shadow-xs cursor-pointer"
+                              title="Live AI Voice Call Drill"
+                            >
+                              <Play size={11} className="fill-purple-500" />
+                              <span className="hidden sm:inline">Call</span>
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>

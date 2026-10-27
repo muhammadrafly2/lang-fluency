@@ -6,7 +6,7 @@ import {
   Bell, Flame, Target, Edit3, BookOpen, ChevronDown, ChevronUp, 
   CheckCircle2, Lock, Play, Volume2, PhoneCall, Sparkles, 
   ArrowRight, Shield, Award, Check, Search, RotateCcw,
-  Smartphone, Monitor, User, MessageSquare
+  Smartphone, Monitor, User, MessageSquare, Keyboard
 } from "lucide-react";
 import { SupportedLanguageOption } from "./LanguageSelectionSheet";
 import { CourseRoadmap, RoadmapSection, Scenario } from "@/types";
@@ -16,6 +16,7 @@ import { LanguageEssentialsModules } from "./LanguageEssentialsModules";
 import { CourseChaptersAccordion } from "./CourseChaptersAccordion";
 import { speakElena, selectElenaVoice } from "@/utils/speechEngine";
 import { getCoachPersona, CoachPersona } from "@/utils/coachPersonas";
+import { PracticeUnit, getPracticeUnitsForLanguage } from "@/data/interactivePracticeData";
 
 export interface CleanHomeDashboardProps {
   currentLanguage: SupportedLanguageOption;
@@ -29,6 +30,7 @@ export interface CleanHomeDashboardProps {
   ttsVoices: SpeechSynthesisVoice[];
   ttsVoiceURI?: string;
   onOpenCurriculum?: () => void;
+  onOpenPracticeUnit?: (unit: PracticeUnit) => void;
 }
 
 export function CleanHomeDashboard({
@@ -43,6 +45,7 @@ export function CleanHomeDashboard({
   ttsVoices,
   ttsVoiceURI,
   onOpenCurriculum,
+  onOpenPracticeUnit,
 }: CleanHomeDashboardProps) {
   // Level filter pill: "all" | "beginner" | "intermediate" | "advanced" | "expert"
   const [activeLevel, setActiveLevel] = useState<string>("beginner");
@@ -241,16 +244,31 @@ export function CleanHomeDashboard({
                 </p>
               </div>
             </div>
-            {onOpenCurriculum && (
-              <button
-                type="button"
-                onClick={onOpenCurriculum}
-                className="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl bg-white hover:bg-emerald-50 text-[#0f4a3c] font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer shrink-0 hover:scale-[1.02] active:scale-[0.98]"
-              >
-                <BookOpen size={14} />
-                <span>Browse Curriculum</span>
-              </button>
-            )}
+            <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 flex-wrap">
+              {onOpenPracticeUnit && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const units = getPracticeUnitsForLanguage(currentLanguage.code);
+                    if (units.length > 0) onOpenPracticeUnit(units[0]);
+                  }}
+                  className="flex-1 sm:flex-none px-4 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <Keyboard size={14} />
+                  <span>Type & Speak</span>
+                </button>
+              )}
+              {onOpenCurriculum && (
+                <button
+                  type="button"
+                  onClick={onOpenCurriculum}
+                  className="flex-1 sm:flex-none px-4 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-white hover:bg-emerald-50 text-[#0f4a3c] font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <BookOpen size={14} />
+                  <span>Curriculum</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* ── Grid: Today's Goal & Course Progress (Responsive: 1 col on mobile, 2 col on desktop) ── */}
@@ -448,6 +466,7 @@ export function CleanHomeDashboard({
             sections={course.sections}
             languageCode={currentLanguage.code}
             onStartCall={onStartCall}
+            onOpenPracticeUnit={onOpenPracticeUnit}
             ttsVoiceURI={ttsVoiceURI}
           />
         </div>

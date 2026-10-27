@@ -32,6 +32,8 @@ import {
 import { WelcomeOnboardingModal } from "@/components/WelcomeOnboardingModal";
 import { CleanHomeDashboard } from "@/components/CleanHomeDashboard";
 import { CurriculumExplorerModal } from "@/components/CurriculumExplorerModal";
+import { InteractivePracticeModal } from "@/components/InteractivePracticeModal";
+import { PracticeUnit, getPracticeUnitsForLanguage } from "@/data/interactivePracticeData";
 import { getCoachPersona } from "@/utils/coachPersonas";
 
 // Initial Catalog of Scenarios per PRD specifications
@@ -491,6 +493,8 @@ export default function FluencyAIPage() {
   const [isStudioModalOpen, setIsStudioModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isCurriculumModalOpen, setIsCurriculumModalOpen] = useState(false);
+  const [selectedPracticeUnit, setSelectedPracticeUnit] = useState<PracticeUnit | null>(null);
+  const [isPracticeModalOpen, setIsPracticeModalOpen] = useState(false);
 
   // App Settings initialized identically on server and client to avoid SSR hydration mismatch
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -692,6 +696,22 @@ export default function FluencyAIPage() {
               <span className="hidden sm:inline">Curriculum</span>
             </button>
 
+            {/* Interactive Practice Button (Type & Speak) matching user request */}
+            <button
+              onClick={() => {
+                const units = getPracticeUnitsForLanguage(settings.targetLanguage);
+                if (units.length > 0) {
+                  setSelectedPracticeUnit(units[0]);
+                  setIsPracticeModalOpen(true);
+                }
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#58cc02] hover:bg-[#46a302] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              title="Interactive Typing & Speaking Practice (Duolingo Style)"
+            >
+              <span className="text-xs">⌨️</span>
+              <span className="hidden sm:inline">Practice</span>
+            </button>
+
             {/* Welcome Tour Button */}
             <button
               onClick={() => setIsWelcomeModalOpen(true)}
@@ -767,6 +787,10 @@ export default function FluencyAIPage() {
               ttsVoices={ttsVoices}
               ttsVoiceURI={settings.ttsVoiceURI}
               onOpenCurriculum={() => setIsCurriculumModalOpen(true)}
+              onOpenPracticeUnit={(unit) => {
+                setSelectedPracticeUnit(unit);
+                setIsPracticeModalOpen(true);
+              }}
             />
 
             {/* Quick Practice & Progression Rings section */}
@@ -829,6 +853,10 @@ export default function FluencyAIPage() {
                 (s) => s.id === titleOrId || s.title.toLowerCase().includes(titleOrId.toLowerCase())
               ) || scenarios[0];
               handleStartCall(match);
+            }}
+            onOpenPracticeUnit={(unit) => {
+              setSelectedPracticeUnit(unit);
+              setIsPracticeModalOpen(true);
             }}
           />
         )}
@@ -959,6 +987,23 @@ export default function FluencyAIPage() {
             }
           }
           handleStartFreeCall();
+        }}
+      />
+
+      {/* ── Screen: Interactive Practice Modal (Typing & Speaking) matching User Image 1 & 2 ── */}
+      <InteractivePracticeModal
+        isOpen={isPracticeModalOpen}
+        unit={selectedPracticeUnit}
+        languageCode={settings.targetLanguage}
+        ttsVoiceURI={settings.ttsVoiceURI}
+        onClose={() => setIsPracticeModalOpen(false)}
+        onCompleteUnit={({ xpGained, accuracyPct }) => {
+          setUserXp((prev) => prev + xpGained);
+          setRingData((prev) => ({
+            ...prev,
+            clarityPct: Math.min(100, Math.max(prev.clarityPct, accuracyPct)),
+            vocabAdded: prev.vocabAdded + 4,
+          }));
         }}
       />
     </div>

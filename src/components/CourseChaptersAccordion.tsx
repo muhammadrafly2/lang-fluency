@@ -4,15 +4,17 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   BookOpen, ChevronDown, ChevronUp, CheckCircle2, 
-  Volume2, PhoneCall 
+  Volume2, PhoneCall, Keyboard 
 } from "lucide-react";
 import { RoadmapSection } from "@/types";
 import { speakElena } from "@/utils/speechEngine";
+import { getPracticeUnitsForLanguage, PracticeUnit } from "@/data/interactivePracticeData";
 
 interface CourseChaptersAccordionProps {
   sections: RoadmapSection[];
   languageCode: string;
   onStartCall: (scenarioId?: string) => void;
+  onOpenPracticeUnit?: (unit: PracticeUnit) => void;
   ttsVoiceURI?: string;
 }
 
@@ -20,8 +22,10 @@ export function CourseChaptersAccordion({
   sections,
   languageCode,
   onStartCall,
+  onOpenPracticeUnit,
   ttsVoiceURI,
 }: CourseChaptersAccordionProps) {
+  const practiceUnits = getPracticeUnitsForLanguage(languageCode);
   const [expandedChapterId, setExpandedChapterId] = useState<string>(
     sections.length > 0 ? sections[0].id : ""
   );
@@ -159,25 +163,41 @@ export function CourseChaptersAccordion({
                           </div>
                         </div>
 
-                        {/* Audio Speak Button */}
-                        {stepText && (
+                        <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                          {/* Audio Speak Button */}
+                          {stepText && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                speakElena(stepText, {
+                                  voiceURI: ttsVoiceURI,
+                                  targetLanguage: languageCode,
+                                  rate: 0.95,
+                                  pitch: 1.02,
+                                });
+                              }}
+                              className="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-emerald-800 text-xs font-medium flex items-center gap-1 transition-all cursor-pointer"
+                              title="Listen with native pronunciation"
+                            >
+                              <Volume2 size={13} />
+                              <span className="hidden sm:inline">Listen</span>
+                            </button>
+                          )}
+
+                          {/* Interactive Typing & Speaking Practice Button */}
                           <button
                             type="button"
                             onClick={() => {
-                              speakElena(stepText, {
-                                voiceURI: ttsVoiceURI,
-                                targetLanguage: languageCode,
-                                rate: 0.95,
-                                pitch: 1.02,
-                              });
+                              const matchingUnit = practiceUnits[sIdx % practiceUnits.length] || practiceUnits[0];
+                              onOpenPracticeUnit?.(matchingUnit);
                             }}
-                            className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-emerald-800 text-xs font-medium flex items-center gap-1.5 shrink-0 self-end sm:self-center transition-all cursor-pointer"
-                            title="Listen with native pronunciation"
+                            className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[#0f4a3c] text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                            title="Interactive Typing & Speaking Practice"
                           >
-                            <Volume2 size={13} />
-                            <span>Listen</span>
+                            <Keyboard size={13} />
+                            <span>Practice</span>
                           </button>
-                        )}
+                        </div>
                       </div>
                     );
                   })}
@@ -205,13 +225,27 @@ export function CourseChaptersAccordion({
                               </div>
                             </div>
 
-                            <button
-                              type="button"
-                              onClick={() => onStartCall(act.scenarioId)}
-                              className="px-3.5 py-1.5 rounded-lg bg-[#0f4a3c] hover:bg-[#0a352a] text-white text-xs font-bold shrink-0 transition-all cursor-pointer shadow-xs"
-                            >
-                              Practice
-                            </button>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const matchingUnit = practiceUnits[aIdx % practiceUnits.length] || practiceUnits[0];
+                                  onOpenPracticeUnit?.(matchingUnit);
+                                }}
+                                className="px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-50 border border-emerald-300 text-[#0f4a3c] text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                              >
+                                <Keyboard size={12} />
+                                <span className="hidden sm:inline">Type & Speak</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => onStartCall(act.scenarioId)}
+                                className="px-3.5 py-1.5 rounded-lg bg-[#0f4a3c] hover:bg-[#0a352a] text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                              >
+                                Call
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
