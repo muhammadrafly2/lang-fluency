@@ -6,7 +6,7 @@ import {
   Bell, Flame, Target, Edit3, BookOpen, ChevronDown, ChevronUp, 
   CheckCircle2, Lock, Play, Volume2, PhoneCall, Sparkles, 
   ArrowRight, Shield, Award, Check, Search, RotateCcw,
-  Smartphone, Monitor, User, MessageSquare, Keyboard
+  Smartphone, Monitor, User, MessageSquare, Keyboard, GraduationCap
 } from "lucide-react";
 import { SupportedLanguageOption } from "./LanguageSelectionSheet";
 import { CourseRoadmap, RoadmapSection, Scenario } from "@/types";
@@ -31,6 +31,7 @@ export interface CleanHomeDashboardProps {
   ttsVoiceURI?: string;
   onOpenCurriculum?: () => void;
   onOpenPracticeUnit?: (unit: PracticeUnit) => void;
+  onOpenJLPTModal?: (level?: "N5" | "N4" | "N3" | "N2" | "N1") => void;
 }
 
 export function CleanHomeDashboard({
@@ -46,6 +47,7 @@ export function CleanHomeDashboard({
   ttsVoiceURI,
   onOpenCurriculum,
   onOpenPracticeUnit,
+  onOpenJLPTModal,
 }: CleanHomeDashboardProps) {
   // Level filter pill: "all" | "beginner" | "intermediate" | "advanced" | "expert"
   const [activeLevel, setActiveLevel] = useState<string>("beginner");
@@ -270,6 +272,55 @@ export function CleanHomeDashboard({
               )}
             </div>
           </div>
+
+          {/* ── JLPT N5–N1 Exam Prep Center Card ── */}
+          {onOpenJLPTModal && (
+            <div className="w-full bg-[#1c2237] rounded-3xl p-4 sm:p-5 text-white shadow-md shadow-indigo-950/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-indigo-500/25">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 backdrop-blur-md flex items-center justify-center text-indigo-300 shrink-0 shadow-inner">
+                  <GraduationCap size={24} />
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-rose-300 font-mono">
+                      JLPT N5 → N1 Exam Roadmaps
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-200 text-[10px] font-bold border border-rose-500/30">
+                      Units • Exercises • Kana & Kanji
+                    </span>
+                  </div>
+                  <h3 className="text-sm sm:text-base font-bold text-white mt-0.5">
+                    Targeted Roadmaps & Exercises Specifically Designed for Passing JLPT
+                  </h3>
+                  <p className="text-[11px] sm:text-xs text-indigo-200/80 mt-0.5">
+                    Master Kana, Kanji, Key Grammar & test traps for N5, N4, N3, N2, and N1
+                  </p>
+                </div>
+              </div>
+
+              {/* Quick-Level Buttons */}
+              <div className="flex items-center gap-1.5 w-full md:w-auto shrink-0 flex-wrap">
+                {(["N5", "N4", "N3", "N2", "N1"] as const).map((lvl) => (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => onOpenJLPTModal(lvl)}
+                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono font-bold text-xs border border-white/15 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                  >
+                    {lvl}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => onOpenJLPTModal("N5")}
+                  className="px-3.5 py-1.5 rounded-xl bg-[#0f4a3c] hover:bg-[#0a352a] text-white font-bold text-xs shadow-md transition-all cursor-pointer flex items-center gap-1 border border-emerald-600/40"
+                >
+                  <span>Open Hub</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* ── Grid: Today's Goal & Course Progress (Responsive: 1 col on mobile, 2 col on desktop) ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

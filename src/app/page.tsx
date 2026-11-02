@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import {
   Sparkles, Zap, LayoutGrid, AudioLines, Award, Trophy, TrendingUp,
-  Settings as SettingsIcon, ChevronDown, Globe, BookOpen, Flame
+  Settings as SettingsIcon, ChevronDown, Globe, BookOpen, Flame,
+  GraduationCap, Keyboard
 } from "lucide-react";
 
 import {
@@ -33,6 +34,8 @@ import { WelcomeOnboardingModal } from "@/components/WelcomeOnboardingModal";
 import { CleanHomeDashboard } from "@/components/CleanHomeDashboard";
 import { CurriculumExplorerModal } from "@/components/CurriculumExplorerModal";
 import { InteractivePracticeModal } from "@/components/InteractivePracticeModal";
+import { JLPTStudyRoadmapModal } from "@/components/JLPTStudyRoadmapModal";
+import { JLPTLevel } from "@/data/jlpt";
 import { PracticeUnit, getPracticeUnitsForLanguage } from "@/data/interactivePracticeData";
 import { getCoachPersona } from "@/utils/coachPersonas";
 
@@ -495,6 +498,8 @@ export default function FluencyAIPage() {
   const [isCurriculumModalOpen, setIsCurriculumModalOpen] = useState(false);
   const [selectedPracticeUnit, setSelectedPracticeUnit] = useState<PracticeUnit | null>(null);
   const [isPracticeModalOpen, setIsPracticeModalOpen] = useState(false);
+  const [isJlptModalOpen, setIsJlptModalOpen] = useState(false);
+  const [jlptInitialLevel, setJlptInitialLevel] = useState<JLPTLevel>("N5");
 
   // App Settings initialized identically on server and client to avoid SSR hydration mismatch
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -708,9 +713,24 @@ export default function FluencyAIPage() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#58cc02] hover:bg-[#46a302] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
               title="Interactive Typing & Speaking Practice (Duolingo Style)"
             >
-              <span className="text-xs">⌨️</span>
+              <Keyboard size={13} />
               <span className="hidden sm:inline">Practice</span>
             </button>
+
+            {/* JLPT Roadmap Pill if Japanese selected */}
+            {settings.targetLanguage === "japanese" && (
+              <button
+                onClick={() => {
+                  setJlptInitialLevel("N5");
+                  setIsJlptModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0f4a3c] hover:bg-[#0a352a] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer border border-emerald-700/40"
+                title="JLPT N5-N1 Passing Roadmaps, Kana & Kanji"
+              >
+                <GraduationCap size={13} />
+                <span className="hidden sm:inline">JLPT N5–N1</span>
+              </button>
+            )}
 
             {/* Welcome Tour Button */}
             <button
@@ -790,6 +810,10 @@ export default function FluencyAIPage() {
               onOpenPracticeUnit={(unit) => {
                 setSelectedPracticeUnit(unit);
                 setIsPracticeModalOpen(true);
+              }}
+              onOpenJLPTModal={(lvl) => {
+                if (lvl) setJlptInitialLevel(lvl);
+                setIsJlptModalOpen(true);
               }}
             />
 
@@ -1004,6 +1028,27 @@ export default function FluencyAIPage() {
             clarityPct: Math.min(100, Math.max(prev.clarityPct, accuracyPct)),
             vocabAdded: prev.vocabAdded + 4,
           }));
+        }}
+      />
+
+      {/* ── Screen: JLPT N5–N1 Comprehensive Passing Center Modal ── */}
+      <JLPTStudyRoadmapModal
+        isOpen={isJlptModalOpen}
+        initialLevel={jlptInitialLevel}
+        ttsVoiceURI={settings.ttsVoiceURI}
+        onClose={() => setIsJlptModalOpen(false)}
+        onStartScenarioCall={(scenarioId) => {
+          setIsJlptModalOpen(false);
+          if (scenarioId) {
+            const match = scenarios.find(
+              (s) => s.id === scenarioId || s.title.toLowerCase().includes(scenarioId.toLowerCase())
+            );
+            if (match) {
+              handleStartCall(match);
+              return;
+            }
+          }
+          handleStartFreeCall();
         }}
       />
     </div>
