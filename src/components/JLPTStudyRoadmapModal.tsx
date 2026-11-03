@@ -8,7 +8,7 @@ import {
   Compass, ChevronDown, ChevronUp, Layers, Check,
   AlertCircle, Zap, HelpCircle, Trophy, Eye, EyeOff,
   GraduationCap, Clock, Languages, Lightbulb, MessageSquare,
-  Bookmark, FileText, CheckCheck, Flame
+  Bookmark, FileText, CheckCheck, Flame, PenTool, PenLine
 } from "lucide-react";
 
 import {
@@ -25,6 +25,11 @@ import {
   KANA_MASTERY_NOTES,
 } from "@/data/jlpt";
 import { speakElena } from "@/utils/speechEngine";
+import { playSuccessChime, playGentleError } from "@/utils/soundEffects";
+import {
+  KanaKanjiStrokePracticeModal,
+  PracticeTargetCharacter,
+} from "./KanaKanjiStrokePracticeModal";
 
 interface JLPTStudyRoadmapModalProps {
   isOpen: boolean;
@@ -119,7 +124,10 @@ export function JLPTStudyRoadmapModal({
     setIsCorrect(!!correct);
     setIsAnswerSubmitted(true);
     if (correct) {
+      playSuccessChime();
       setQuizScore((prev) => prev + currentExercise.xpReward);
+    } else {
+      playGentleError();
     }
   };
 
@@ -160,6 +168,131 @@ export function JLPTStudyRoadmapModal({
         k.exampleWords.some((e) => e.word.includes(q) || e.meaning.toLowerCase().includes(q) || e.reading.includes(q))
     );
   }, [levelKanji, kanjiSearch]);
+
+  // ── Stroke Practice Modal State & Handlers ──
+  const [strokePracticeTarget, setStrokePracticeTarget] = useState<PracticeTargetCharacter | null>(null);
+  const [isStrokePracticeOpen, setIsStrokePracticeOpen] = useState(false);
+  const [strokePracticeSource, setStrokePracticeSource] = useState<{
+    type: "kanji" | "hiragana" | "katakana";
+    index: number;
+  } | null>(null);
+
+  const openStrokePracticeForKanji = (item: KanjiEntry, index: number) => {
+    setStrokePracticeTarget({
+      character: item.kanji,
+      meanings: item.meanings,
+      onyomi: item.onyomi,
+      kunyomi: item.kunyomi,
+      strokeCount: item.strokeCount,
+      type: "kanji",
+      jlptLevel: activeLevel,
+      exampleWords: item.exampleWords,
+    });
+    setStrokePracticeSource({ type: "kanji", index });
+    setIsStrokePracticeOpen(true);
+  };
+
+  const openStrokePracticeForKana = (k: KanaEntry, index: number, type: "hiragana" | "katakana") => {
+    setStrokePracticeTarget({
+      character: k.kana,
+      romaji: k.romaji,
+      type,
+    });
+    setStrokePracticeSource({ type, index });
+    setIsStrokePracticeOpen(true);
+  };
+
+  const handleNavigateNextCharacter = () => {
+    if (!strokePracticeSource) return;
+    const { type, index } = strokePracticeSource;
+    if (type === "kanji") {
+      const nextIdx = (index + 1) % filteredKanji.length;
+      const nextItem = filteredKanji[nextIdx];
+      if (nextItem) {
+        setStrokePracticeTarget({
+          character: nextItem.kanji,
+          meanings: nextItem.meanings,
+          onyomi: nextItem.onyomi,
+          kunyomi: nextItem.kunyomi,
+          strokeCount: nextItem.strokeCount,
+          type: "kanji",
+          jlptLevel: activeLevel,
+          exampleWords: nextItem.exampleWords,
+        });
+        setStrokePracticeSource({ type: "kanji", index: nextIdx });
+      }
+    } else if (type === "hiragana") {
+      const list = KANA_REFERENCE.hiragana;
+      const nextIdx = (index + 1) % list.length;
+      const nextItem = list[nextIdx];
+      if (nextItem) {
+        setStrokePracticeTarget({
+          character: nextItem.kana,
+          romaji: nextItem.romaji,
+          type: "hiragana",
+        });
+        setStrokePracticeSource({ type: "hiragana", index: nextIdx });
+      }
+    } else if (type === "katakana") {
+      const list = KANA_REFERENCE.katakana;
+      const nextIdx = (index + 1) % list.length;
+      const nextItem = list[nextIdx];
+      if (nextItem) {
+        setStrokePracticeTarget({
+          character: nextItem.kana,
+          romaji: nextItem.romaji,
+          type: "katakana",
+        });
+        setStrokePracticeSource({ type: "katakana", index: nextIdx });
+      }
+    }
+  };
+
+  const handleNavigatePrevCharacter = () => {
+    if (!strokePracticeSource) return;
+    const { type, index } = strokePracticeSource;
+    if (type === "kanji") {
+      const prevIdx = (index - 1 + filteredKanji.length) % filteredKanji.length;
+      const prevItem = filteredKanji[prevIdx];
+      if (prevItem) {
+        setStrokePracticeTarget({
+          character: prevItem.kanji,
+          meanings: prevItem.meanings,
+          onyomi: prevItem.onyomi,
+          kunyomi: prevItem.kunyomi,
+          strokeCount: prevItem.strokeCount,
+          type: "kanji",
+          jlptLevel: activeLevel,
+          exampleWords: prevItem.exampleWords,
+        });
+        setStrokePracticeSource({ type: "kanji", index: prevIdx });
+      }
+    } else if (type === "hiragana") {
+      const list = KANA_REFERENCE.hiragana;
+      const prevIdx = (index - 1 + list.length) % list.length;
+      const prevItem = list[prevIdx];
+      if (prevItem) {
+        setStrokePracticeTarget({
+          character: prevItem.kana,
+          romaji: prevItem.romaji,
+          type: "hiragana",
+        });
+        setStrokePracticeSource({ type: "hiragana", index: prevIdx });
+      }
+    } else if (type === "katakana") {
+      const list = KANA_REFERENCE.katakana;
+      const prevIdx = (index - 1 + list.length) % list.length;
+      const prevItem = list[prevIdx];
+      if (prevItem) {
+        setStrokePracticeTarget({
+          character: prevItem.kana,
+          romaji: prevItem.romaji,
+          type: "katakana",
+        });
+        setStrokePracticeSource({ type: "katakana", index: prevIdx });
+      }
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -861,7 +994,7 @@ export function JLPTStudyRoadmapModal({
                           <span className="text-3xl font-bold font-serif text-slate-900">
                             {item.kanji}
                           </span>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1.5">
                             <span className="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-mono text-slate-600 border border-slate-200">
                               {item.strokeCount}画
                             </span>
@@ -872,6 +1005,15 @@ export function JLPTStudyRoadmapModal({
                               title="Listen"
                             >
                               <Volume2 size={13} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => openStrokePracticeForKanji(item, idx)}
+                              className="h-7 px-2.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-semibold flex items-center gap-1 transition-all cursor-pointer border border-emerald-200/80 shadow-2xs hover:scale-102"
+                              title="Practice Stroke Order Writing"
+                            >
+                              <PenTool size={11} className="text-emerald-700" />
+                              <span>Write</span>
                             </button>
                           </div>
                         </div>
@@ -955,21 +1097,45 @@ export function JLPTStudyRoadmapModal({
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-10 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2.5">
                     {KANA_REFERENCE.hiragana.map((k: KanaEntry, i: number) => (
-                      <button
+                      <div
                         key={i}
-                        type="button"
-                        onClick={() => playSpeech(k.kana)}
-                        className="bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-400 p-2.5 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all group cursor-pointer shadow-xs"
+                        className="bg-white hover:border-emerald-300 border border-slate-200 p-2.5 rounded-2xl flex flex-col items-center justify-between gap-1.5 transition-all group shadow-xs hover:shadow-sm"
                       >
-                        <span className="text-xl font-bold font-serif text-slate-900 group-hover:text-emerald-800">
-                          {k.kana}
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-500">
-                          {k.romaji}
-                        </span>
-                      </button>
+                        <div
+                          className="flex flex-col items-center cursor-pointer w-full text-center py-0.5"
+                          onClick={() => playSpeech(k.kana)}
+                          title="Click to pronounce"
+                        >
+                          <span className="text-2xl font-bold font-serif text-slate-900 group-hover:text-emerald-800 transition-colors">
+                            {k.kana}
+                          </span>
+                          <span className="text-[11px] font-mono text-slate-500 font-medium">
+                            {k.romaji}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-1 w-full pt-1.5 border-t border-slate-100">
+                          <button
+                            type="button"
+                            onClick={() => playSpeech(k.kana)}
+                            className="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                            title="Listen"
+                          >
+                            <Volume2 size={11} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openStrokePracticeForKana(k, i, "hiragana")}
+                            className="h-6 px-1.5 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer border border-emerald-200/60"
+                            title="Practice Stroke Order"
+                          >
+                            <PenTool size={10} className="text-emerald-700" />
+                            <span>Write</span>
+                          </button>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -987,21 +1153,45 @@ export function JLPTStudyRoadmapModal({
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-10 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2.5">
                     {KANA_REFERENCE.katakana.map((k: KanaEntry, i: number) => (
-                      <button
+                      <div
                         key={i}
-                        type="button"
-                        onClick={() => playSpeech(k.kana)}
-                        className="bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-400 p-2.5 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all group cursor-pointer shadow-xs"
+                        className="bg-white hover:border-emerald-300 border border-slate-200 p-2.5 rounded-2xl flex flex-col items-center justify-between gap-1.5 transition-all group shadow-xs hover:shadow-sm"
                       >
-                        <span className="text-xl font-bold font-serif text-slate-900 group-hover:text-emerald-800">
-                          {k.kana}
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-500">
-                          {k.romaji}
-                        </span>
-                      </button>
+                        <div
+                          className="flex flex-col items-center cursor-pointer w-full text-center py-0.5"
+                          onClick={() => playSpeech(k.kana)}
+                          title="Click to pronounce"
+                        >
+                          <span className="text-2xl font-bold font-serif text-slate-900 group-hover:text-emerald-800 transition-colors">
+                            {k.kana}
+                          </span>
+                          <span className="text-[11px] font-mono text-slate-500 font-medium">
+                            {k.romaji}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-1 w-full pt-1.5 border-t border-slate-100">
+                          <button
+                            type="button"
+                            onClick={() => playSpeech(k.kana)}
+                            className="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                            title="Listen"
+                          >
+                            <Volume2 size={11} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openStrokePracticeForKana(k, i, "katakana")}
+                            className="h-6 px-1.5 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer border border-emerald-200/60"
+                            title="Practice Stroke Order"
+                          >
+                            <PenTool size={10} className="text-emerald-700" />
+                            <span>Write</span>
+                          </button>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -1010,6 +1200,16 @@ export function JLPTStudyRoadmapModal({
           )}
         </div>
       </motion.div>
+
+      {/* ── Interactive Stroke Order Writing Studio Modal ── */}
+      <KanaKanjiStrokePracticeModal
+        isOpen={isStrokePracticeOpen}
+        onClose={() => setIsStrokePracticeOpen(false)}
+        target={strokePracticeTarget}
+        onNavigateNext={handleNavigateNextCharacter}
+        onNavigatePrev={handleNavigatePrevCharacter}
+        ttsVoiceURI={ttsVoiceURI}
+      />
     </div>
   );
 }

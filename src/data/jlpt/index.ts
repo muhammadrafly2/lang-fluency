@@ -1,5 +1,6 @@
 export * from "./types";
 export * from "./kanaData";
+export * from "./strokeData";
 export { N5_KANJI } from "./kanjiN5";
 export { N4_KANJI } from "./kanjiN4";
 export { N3_KANJI } from "./kanjiN3";
